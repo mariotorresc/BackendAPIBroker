@@ -1,4 +1,4 @@
-/APIMariosBroker2/node_modules
-/APIMariosBroker2/.env
+/APIMariosBroker/node_modules
+/APIMariosBroker/.env
 ./SSHAPIMariosBrokerPassword.pem
 SSHAPIMariosBrokerPassword.pem
