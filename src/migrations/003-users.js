@@ -16,10 +16,6 @@ module.exports = {
       type: Sequelize.STRING(70),
       unique: true,
     },
-    money: {
-      allowNull: false,
-      type: Sequelize.FLOAT,
-    },
     id: {
       allowNull: false,
       autoIncrement: true,
@@ -29,6 +25,10 @@ module.exports = {
     lastName: {
       allowNull: false,
       type: Sequelize.STRING(70),
+    },
+    money: {
+      allowNull: false,
+      type: Sequelize.INTEGER,
     },
     name: {
       allowNull: false,

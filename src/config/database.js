@@ -2,23 +2,24 @@ require('dotenv').config();
 
 const config = {
   default: {
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    dialect: process.env.DB_DIALECT || 'postgres',
     database: process.env.DB_NAME,
+    dialect: process.env.DB_DIALECT || 'postgres',
     host: process.env.DB_HOST || '127.0.0.1',
+    password: process.env.DB_PASSWORD,
+    username: process.env.DB_USERNAME,
   },
   development: {
-    extend: 'default',
     database: process.env.DB_NAME || 'iic2513template_dev',
-  },
-  test: {
     extend: 'default',
-    database: 'iic2513template_test',
   },
   production: {
     extend: 'default',
+    // eslint-disable-next-line camelcase
     use_env_variable: 'DATABASE_URL',
+  },
+  test: {
+    database: 'iic2513template_test',
+    extend: 'default',
   },
 };
 
