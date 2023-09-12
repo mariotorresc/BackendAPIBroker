@@ -16,6 +16,13 @@ module.exports = {
       type: Sequelize.STRING(70),
       unique: true,
     },
+<<<<<<< HEAD
+=======
+    money: {
+      allowNull: false,
+      type: Sequelize.FLOAT,
+    },
+>>>>>>> 22dc1b0 (feat(cli, users, prettier, eslint))
     id: {
       allowNull: false,
       autoIncrement: true,
@@ -26,10 +33,13 @@ module.exports = {
       allowNull: false,
       type: Sequelize.STRING(70),
     },
+<<<<<<< HEAD
     money: {
       allowNull: false,
       type: Sequelize.INTEGER,
     },
+=======
+>>>>>>> 22dc1b0 (feat(cli, users, prettier, eslint))
     name: {
       allowNull: false,
       type: Sequelize.STRING(70),

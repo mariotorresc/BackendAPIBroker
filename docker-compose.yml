@@ -42,7 +42,7 @@ services:
     command: ['yarn', 'migrate'] # Run migrations using the "migrate" script
 
   mqttreceiver:
-    build: .
+    build: ./MQTTConections
     environment:
       MQTT_HOST: ${MQTT_HOST}
       MQTT_PORT: ${MQTT_PORT}
@@ -55,7 +55,11 @@ services:
       - app-data:/app/data
     
   mqttsender:
+<<<<<<< HEAD
     build: .
+=======
+    build: ./MQTTConections
+>>>>>>> 22dc1b0 (feat(cli, users, prettier, eslint))
     environment:
       MQTT_HOST: ${MQTT_HOST}
       MQTT_PORT: ${MQTT_PORT}

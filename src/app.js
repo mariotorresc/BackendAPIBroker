@@ -79,7 +79,7 @@ app.use(
     formLimit: '2000mb',
     jsonLimit: '2000mb',
     textLimit: '2000mb',
-  })
+  }),
 );
 
 app.use((ctx, next) => {

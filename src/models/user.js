@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 /* eslint-disable no-param-reassign */
 const { Model } = require('sequelize');
 const bcrypt = require('bcrypt');
+=======
+const { Model } = require('sequelize');
+>>>>>>> 22dc1b0 (feat(cli, users, prettier, eslint))
 
 module.exports = (sequelize, DataTypes) => {
   class user extends Model {}
@@ -22,10 +26,13 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: true,
         },
       },
+<<<<<<< HEAD
       money: {
         allowNull: false,
         type: DataTypes.INTEGER,
       },
+=======
+>>>>>>> 22dc1b0 (feat(cli, users, prettier, eslint))
       name: {
         allowNull: false,
         type: DataTypes.STRING,
@@ -33,6 +40,16 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: true,
         },
       },
+<<<<<<< HEAD
+=======
+      money: {
+        allowNull: false,
+        type: DataTypes.FLOAT,
+        validate: {
+          notEmpty: true,
+        },
+      },
+>>>>>>> 22dc1b0 (feat(cli, users, prettier, eslint))
       password: {
         allowNull: false,
         type: DataTypes.STRING,
@@ -45,6 +62,7 @@ module.exports = (sequelize, DataTypes) => {
       modelName: 'user',
       paranoid: true,
       sequelize,
+<<<<<<< HEAD
     }
   );
   user.associate = function associate(models) {
@@ -80,5 +98,9 @@ module.exports = (sequelize, DataTypes) => {
   user.prototype.checkPassword = function checkPassword(password) {
     return bcrypt.compare(password, this.password);
   };
+=======
+    },
+  );
+>>>>>>> 22dc1b0 (feat(cli, users, prettier, eslint))
   return user;
 };
