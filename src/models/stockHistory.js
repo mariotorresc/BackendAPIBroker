@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       modelName: 'stocksHistories',
       paranoid: true,
       sequelize,
-    }
+    },
   );
   stocksHistories.associate = function associate(models) {
     stocksHistories.belongsTo(models.stock, {

@@ -1,6 +1,6 @@
-require("dotenv").config();
+require('dotenv').config();
 const mqtt = require('mqtt');
-const { SaveStocks } = require('./src/queue');
+const { SaveStocks } = require('../src/queue');
 
 const options = {
   host: process.env.MQTT_HOST,
@@ -12,7 +12,7 @@ const options = {
 const mqttClient = mqtt.connect(options);
 
 mqttClient.on('connect', () => {
-  console.log('Connected to MQTT broker');
+  console.log('Connected to MQTT RECEIVER broker');
   mqttClient.subscribe('stocks/info');
 });
 
@@ -31,4 +31,3 @@ mqttClient.on('error', (error) => {
 mqttClient.on('close', () => {
   console.log('Connection closed');
 });
-

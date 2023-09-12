@@ -1,0 +1,61 @@
+name: Test and Lint for Main
+
+on:
+  pull_request:
+    branches: [staging]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: ${{ env.DB_NAME }}
+          POSTGRES_USER: ${{ env.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB_DIALECT: postgres
+      DB_PORT: 5432
+      DB_USERNAME: myuser
+      DB_PASSWORD: mypassword
+      DB_NAME: brokerdb
+      DB_HOST: localhost
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Wait for PostgreSQL to start
+        run: |
+          until nc -z -v -w30 ${{ env.DB_HOST }} ${{ env.DB_PORT }}
+          do
+            echo "Waiting for PostgreSQL to start..."
+            sleep 5
+          done
+
+      - name: Run database migrations (if applicable)
+        run: yarn migrate
+
+      - name: Run tests
+        run: yarn test
+
+      - name: Run lint
+        run: yarn lint
