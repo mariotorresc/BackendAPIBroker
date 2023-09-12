@@ -1,5 +1,5 @@
 const path = require('path');
-require("dotenv").config();
+require('dotenv').config();
 const Koa = require('koa');
 const koaLogger = require('koa-logger');
 const koaFlashMessage = require('koa-flash-message').default;
@@ -41,7 +41,6 @@ if (!testMode) {
   app.use(koaLogger());
 }
 
-
 // webpack middleware for dev mode only
 if (developmentMode) {
   // eslint-disable-next-line import/no-extraneous-dependencies, global-require
@@ -67,7 +66,7 @@ app.use(
     formLimit: '2000mb',
     jsonLimit: '2000mb',
     textLimit: '2000mb',
-  })
+  }),
 );
 
 app.use((ctx, next) => {

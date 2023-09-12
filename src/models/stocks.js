@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       lastUpdate: {
         allowNull: false,
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
       },
       shortName: {
         allowNull: true,
@@ -34,9 +34,9 @@ module.exports = (sequelize, DataTypes) => {
       modelName: 'stock',
       paranoid: true,
       sequelize,
-    }
+    },
   );
-  stock.associate = function associate(models){
+  stock.associate = function associate(models) {
     stock.hasMany(models.stocksHistories, {
       foreignKey: 'stockId',
     });

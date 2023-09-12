@@ -1,6 +1,8 @@
+/* eslint-disable radix */
 const KoaRouter = require('koa-router');
 
 const router = new KoaRouter();
+const mqttClientSender = require('../../MQTTConections/mqttSender');
 
 router.get('get-all-stocks', '/', async (ctx) => {
   const page = parseInt(ctx.query.page) || 1;
@@ -48,8 +50,8 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
       symbol: stock.symbol,
       id: stock.id,
       stocksHistories: stock.stocksHistories,
-      totalItems: stock.stocksHistories.length, // Not considering pagination
-      totalPages: Math.ceil(stock.stocksHistories.length / itemsPerPage), // Not considering pagination
+      totalItems: stock.stocksHistories.length,
+      totalPages: Math.ceil(stock.stocksHistories.length / itemsPerPage),
       currentPage: page,
     };
     ctx.status = 200;
@@ -58,4 +60,33 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
     ctx.status = 400;
   }
 });
+
+// receive a purchase from the endpoint /stocks/purchase
+router.post('post-stock-purchase', '/purchase', async (ctx) => {
+  const { symbol, quantity, groupId } = ctx.request.body;
+  try {
+    const stock = await ctx.orm.stock.findOne({
+      where: { symbol },
+    });
+
+    if (!stock) {
+      ctx.status = 404;
+      ctx.body = { message: 'Stock not found' };
+      return;
+    }
+    // send a message to the channel stocks/request
+    const stockRequest = {
+      symbol,
+      quantity,
+      groupId,
+    };
+    mqttClientSender.publish('stocks/request', JSON.stringify(stockRequest));
+    ctx.status = 200;
+    ctx.body = { message: 'Purchase request sent' };
+  } catch (err) {
+    ctx.body = err.message;
+    ctx.status = 400;
+  }
+});
+
 module.exports = router;
