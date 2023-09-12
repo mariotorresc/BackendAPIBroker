@@ -1,3 +1,7 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable max-len */
+/* eslint-disable no-console */
 const { stock, stocksHistories } = require('../models');
 
 async function SaveStocks(stockInfo) {
@@ -7,7 +11,7 @@ async function SaveStocks(stockInfo) {
     try {
       const existingStock = await stock.findOne({ where: { symbol: stockData.symbol } });
       if (existingStock) {
-        await existingStock.update({ price: stockData.price, lastUpdate: new Date() });  // Manually update updatedAt
+        await existingStock.update({ price: stockData.price, lastUpdate: new Date() }); // Manually update updatedAt
         await stocksHistories.create({
           stockId: existingStock.id,
           source: stockData.source,
@@ -16,7 +20,7 @@ async function SaveStocks(stockInfo) {
         });
       } else {
         // Create a new stock
-        stockData.lastUpdate = new Date(); 
+        stockData.lastUpdate = new Date();
         const newStock = await stock.create(stockData);
         await stocksHistories.create({
           stockId: newStock.id,
@@ -29,13 +33,9 @@ async function SaveStocks(stockInfo) {
       console.log(err);
     }
   }
-  console.log("Stocks passed to DB!");
+  console.log('Stocks passed to DB!');
 }
 
 module.exports = {
-  SaveStocks
+  SaveStocks,
 };
-
-
-
-
