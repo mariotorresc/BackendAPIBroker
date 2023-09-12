@@ -2,7 +2,7 @@
 const KoaRouter = require('koa-router');
 
 const router = new KoaRouter();
-const mqttClientSender = require('../../MQTTConections/mqttSender');
+const mqttClientSender = require('../../mqttSender');
 
 router.get('get-all-stocks', '/', async (ctx) => {
   const page = parseInt(ctx.query.page) || 1;
@@ -13,10 +13,10 @@ router.get('get-all-stocks', '/', async (ctx) => {
       offset: (page - 1) * itemsPerPage,
     });
     ctx.body = {
-      totalItems: count,
-      totalPages: Math.ceil(count / itemsPerPage),
       currentPage: page,
       stocks: rows,
+      totalItems: count,
+      totalPages: Math.ceil(count / itemsPerPage),
     };
     ctx.status = 200;
   } catch (err) {
@@ -33,8 +33,8 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
     const stock = await ctx.orm.stock.findOne({
       attributes: ['symbol', 'id'],
       include: {
-        model: ctx.orm.stocksHistories,
         limit: itemsPerPage,
+        model: ctx.orm.stocksHistories,
         offset: (page - 1) * itemsPerPage,
       },
       where: { symbol },
@@ -47,12 +47,12 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
     }
 
     ctx.body = {
-      symbol: stock.symbol,
+      currentPage: page,
       id: stock.id,
       stocksHistories: stock.stocksHistories,
+      symbol: stock.symbol,
       totalItems: stock.stocksHistories.length,
       totalPages: Math.ceil(stock.stocksHistories.length / itemsPerPage),
-      currentPage: page,
     };
     ctx.status = 200;
   } catch (err) {
@@ -76,9 +76,9 @@ router.post('post-stock-purchase', '/purchase', async (ctx) => {
     }
     // send a message to the channel stocks/request
     const stockRequest = {
-      symbol,
-      quantity,
       groupId,
+      quantity,
+      symbol,
     };
     mqttClientSender.publish('stocks/request', JSON.stringify(stockRequest));
     ctx.status = 200;
