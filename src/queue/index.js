@@ -11,22 +11,22 @@ async function SaveStocks(stockInfo) {
     try {
       const existingStock = await stock.findOne({ where: { symbol: stockData.symbol } });
       if (existingStock) {
-        await existingStock.update({ price: stockData.price, lastUpdate: new Date() }); // Manually update updatedAt
+        await existingStock.update({ lastUpdate: new Date(), price: stockData.price }); // Manually update updatedAt
         await stocksHistories.create({
-          stockId: existingStock.id,
-          source: stockData.source,
           currency: stockData.currency,
           price: stockData.price,
+          source: stockData.source,
+          stockId: existingStock.id,
         });
       } else {
         // Create a new stock
         stockData.lastUpdate = new Date();
         const newStock = await stock.create(stockData);
         await stocksHistories.create({
-          stockId: newStock.id,
-          source: stockData.source,
           currency: stockData.currency,
           price: stockData.price,
+          source: stockData.source,
+          stockId: newStock.id,
         });
       }
     } catch (err) {

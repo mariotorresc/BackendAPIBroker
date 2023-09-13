@@ -1,12 +1,12 @@
 require('dotenv').config();
 const mqtt = require('mqtt');
-const { SaveStocks } = require('../src/queue');
+const { SaveStocks } = require('./src/queue');
 
 const options = {
   host: process.env.MQTT_HOST,
+  password: process.env.MQTT_PASSWORD,
   port: process.env.MQTT_PORT,
   username: process.env.MQTT_USER,
-  password: process.env.MQTT_PASSWORD,
 };
 
 const mqttClient = mqtt.connect(options);
