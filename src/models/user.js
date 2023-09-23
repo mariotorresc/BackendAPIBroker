@@ -47,6 +47,15 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
     }
   );
+  user.associate = function associate(models) {
+    user.hasMany(models.request, {
+      foreignKey: 'userId',
+    });
+    user.hasMany(models.userStock, {
+      foreignKey: 'userId',
+    });
+  };
+
   user.beforeBulkCreate(async (users) => {
     const newUsers = Promise.all(
       users.map(async (us) => {
