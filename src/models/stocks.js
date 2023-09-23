@@ -40,6 +40,12 @@ module.exports = (sequelize, DataTypes) => {
     stock.hasMany(models.stocksHistories, {
       foreignKey: 'stockId',
     });
+    stock.hasMany(models.request, {
+      foreignKey: 'stockId',
+    });
+    stock.hasMany(models.userStock, {
+      foreignKey: 'stockId',
+    });
   };
   return stock;
 };
