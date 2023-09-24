@@ -8,15 +8,26 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         type: DataTypes.BOOLEAN,
       },
+      depositToken: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
+      groupId: {
+        allowNull: false,
+        type: DataTypes.STRING,
+      },
       rejected: {
         allowNull: true,
         type: DataTypes.BOOLEAN,
+      },
+      seller: {
+        allowNull: true,
+        type: DataTypes.STRING,
       },
       uuid: {
         allowNull: false,
         type: DataTypes.STRING,
       },
-
       validated: {
         allowNull: true,
         type: DataTypes.BOOLEAN,
