@@ -80,7 +80,7 @@
     "koa-logger": "^3.2.1",
     "koa-override-method": "^1.0.0",
     "koa-router": "^9.4.0",
-    "koa-session": "^6.0.0",
+    "koa-session": "^6.4.0",
     "koa-static": "^5.0.0",
     "mercadopago": "^1.5.9",
     "mqtt": "^5.0.3",

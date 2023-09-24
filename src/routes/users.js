@@ -51,4 +51,24 @@ router.post('users-create', '/register', async (ctx) => {
     });
 });
 
+// Añadir dinero a la billetera //
+router.patch('users-load', '/load', async (ctx) => {
+  const { id } = ctx.body;
+  const { money } = ctx.request.body;
+  const User = await ctx.orm.user.findByPk(id);
+  if (!User) {
+    ctx.status = 404;
+    ctx.body = { message: 'User not found' };
+    return;
+  }
+  try {
+    await User.update({ money });
+    ctx.status = 200;
+    ctx.body = { message: 'El dinero se ha cargado a su billetera' };
+  } catch (error) {
+    ctx.status = 400;
+    ctx.body = error.message;
+  }
+});
+
 module.exports = router;

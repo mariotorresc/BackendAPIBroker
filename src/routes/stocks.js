@@ -89,4 +89,36 @@ router.post('post-stock-purchase', '/purchase', async (ctx) => {
   }
 });
 
+// Stocks Request //
+
+router.post('post-stock-request', '/request', async (ctx) => {
+  const { groupId, quantity, symbol } = ctx.request.body;
+  const request = await ctx.orm.request.create({
+  try {
+    const request = {
+      request_id: "",
+      groupId: 3,
+      symbol: ctx.request.body.symbol,
+      datetime: NewDate(),
+      deposit_token: "",
+      quantity: ctx.request.body.quantity,
+      seller: 0
+    };
+    
+
+// Consigue todas las compañias con nombre y symbol //
+
+router.get('get-companies', '/companies', async (ctx) => {
+  const companies = await ctx.orm.stock.findAll({
+    attributes: ['symbol', 'companyName'], distinct: true,
+  });
+  try {
+    ctx.body = companies;
+    ctx.status = 200;
+  } catch (err) {
+    ctx.body = err.message;
+    ctx.status = 400;
+  }
+});
+
 module.exports = router;

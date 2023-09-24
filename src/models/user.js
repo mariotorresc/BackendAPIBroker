@@ -54,6 +54,9 @@ module.exports = (sequelize, DataTypes) => {
     user.hasMany(models.userStock, {
       foreignKey: 'userId',
     });
+    user.hasMany(models.Session, {
+      foreignKey: 'userId',
+    });
   };
 
   user.beforeBulkCreate(async (users) => {
