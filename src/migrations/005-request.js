@@ -23,6 +23,14 @@ module.exports = {
         allowNull: true,
         type: Sequelize.DATE,
       },
+      depositToken: {
+        allowNull: true,
+        type: Sequelize.STRING(50),
+      },
+      groupId: {
+        allowNull: false,
+        type: Sequelize.STRING(50),
+      },
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -32,6 +40,10 @@ module.exports = {
       rejected: {
         allowNull: true,
         type: Sequelize.BOOLEAN,
+      },
+      seller: {
+        allowNull: true,
+        type: Sequelize.STRING(50),
       },
       stockId: {
         allowNull: false,
