@@ -14,6 +14,7 @@ const mqttClient = mqtt.connect(options);
 mqttClient.on('connect', () => {
   console.log('Connected to MQTT RECEIVER broker');
   mqttClient.subscribe('stocks/info');
+  mqttClient.subscribe('stocks/validation');
 });
 
 mqttClient.on('message', (topic, message) => {
@@ -21,6 +22,11 @@ mqttClient.on('message', (topic, message) => {
     const stockInfo = JSON.parse(message.toString());
     // llenar la base de datos
     SaveStocks(stockInfo);
+  }
+  else if (topic === 'stocks/validation') {
+    const validationInfo = JSON.parse(message.toString());
+    // TODO: actualizar la base de datos
+    console.log(validationInfo);
   }
 });
 
