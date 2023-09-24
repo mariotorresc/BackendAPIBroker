@@ -2,6 +2,7 @@
 const KoaRouter = require('koa-router');
 
 const router = new KoaRouter();
+const { v4: uuidv4 } = require('uuid');
 const mqttClientSender = require('../../mqttSender');
 
 router.get('get-all-stocks', '/', async (ctx) => {
@@ -63,10 +64,11 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
 
 // receive a purchase from the endpoint /stocks/purchase
 router.post('post-stock-purchase', '/purchase', async (ctx) => {
-  const { symbol, quantity, groupId } = ctx.request.body;
+  const { name, symbol1, quantity1 } = ctx.request.body;
+  const request = ctx.orm.request.build({ name, symbol1, });
   try {
     const stock = await ctx.orm.stock.findOne({
-      where: { symbol },
+      where: { symbol: symbol1 },
     });
 
     if (!stock) {
@@ -76,9 +78,13 @@ router.post('post-stock-purchase', '/purchase', async (ctx) => {
     }
     // send a message to the channel stocks/request
     const stockRequest = {
-      groupId,
-      quantity,
-      symbol,
+      request_id: '',
+      group_id: '3',
+      symbol: symbol1,
+      datetime: new Date(),
+      deposit_token: '',
+      quantity: quantity1,
+      seller: 0,
     };
     mqttClientSender.publish('stocks/request', JSON.stringify(stockRequest));
     ctx.status = 200;
@@ -89,28 +95,17 @@ router.post('post-stock-purchase', '/purchase', async (ctx) => {
   }
 });
 
-// Stocks Request //
+// receive validation from the endpoint /stocks/validation
 
-router.post('post-stock-request', '/request', async (ctx) => {
-  const { groupId, quantity, symbol } = ctx.request.body;
-  const request = await ctx.orm.request.create({
-  try {
-    const request = {
-      request_id: "",
-      groupId: 3,
-      symbol: ctx.request.body.symbol,
-      datetime: NewDate(),
-      deposit_token: "",
-      quantity: ctx.request.body.quantity,
-      seller: 0
-    };
-    
+router.get('post-stock-validation', '/validation', async (ctx) => {
+
+});
 
 // Consigue todas las compañias con nombre y symbol //
 
 router.get('get-companies', '/companies', async (ctx) => {
   const companies = await ctx.orm.stock.findAll({
-    attributes: ['symbol', 'companyName'], distinct: true,
+    attributes: ['symbol', 'name'], distinct: true,
   });
   try {
     ctx.body = companies;
@@ -119,6 +114,12 @@ router.get('get-companies', '/companies', async (ctx) => {
     ctx.body = err.message;
     ctx.status = 400;
   }
+});
+
+// Consigue todas las stocks de una compañia //
+
+router.get('get-stocks-by-company', '/companies/:symbol', async (ctx) => {
+
 });
 
 module.exports = router;

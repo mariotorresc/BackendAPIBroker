@@ -11,6 +11,7 @@ const cors = require('koa-cors');
 const override = require('koa-override-method');
 const routes = require('./routes');
 const orm = require('./models');
+const { v4: uuidv4 } = require('uuid');
 
 // App constructor
 const app = new Koa();
