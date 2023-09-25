@@ -2,11 +2,7 @@
 const KoaRouter = require('koa-router');
 
 const router = new KoaRouter();
-<<<<<<< HEAD
 const mqttClientSender = require('../../mqttSender');
-=======
-const mqttClientSender = require('../../MQTTConections/mqttSender');
->>>>>>> 22dc1b0 (feat(cli, users, prettier, eslint))
 
 router.get('get-all-stocks', '/', async (ctx) => {
   const page = parseInt(ctx.query.page) || 1;
@@ -39,7 +35,6 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
       include: {
         limit: itemsPerPage,
         model: ctx.orm.stocksHistories,
-        offset: (page - 1) * itemsPerPage,
       },
       where: { symbol },
     });
@@ -49,20 +44,19 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
       ctx.body = { message: 'Stock not found' };
       return;
     }
-
+    const total = stock.stocksHistories.length;
+    const pageReports = stock.stocksHistories.slice(
+      (page - 1) * itemsPerPage,
+      itemsPerPage * page
+    );
+    const totalPages = Math.ceil(total / itemsPerPage);
     ctx.body = {
       currentPage: page,
       id: stock.id,
-      stocksHistories: stock.stocksHistories,
-<<<<<<< HEAD
+      stocksHistories: pageReports,
       symbol: stock.symbol,
-      totalItems: stock.stocksHistories.length,
-      totalPages: Math.ceil(stock.stocksHistories.length / itemsPerPage),
-=======
-      totalItems: stock.stocksHistories.length,
-      totalPages: Math.ceil(stock.stocksHistories.length / itemsPerPage),
-      currentPage: page,
->>>>>>> 22dc1b0 (feat(cli, users, prettier, eslint))
+      totalItems: total,
+      totalPages,
     };
     ctx.status = 200;
   } catch (err) {
@@ -86,15 +80,9 @@ router.post('post-stock-purchase', '/purchase', async (ctx) => {
     }
     // send a message to the channel stocks/request
     const stockRequest = {
-<<<<<<< HEAD
       groupId,
       quantity,
       symbol,
-=======
-      symbol,
-      quantity,
-      groupId,
->>>>>>> 22dc1b0 (feat(cli, users, prettier, eslint))
     };
     mqttClientSender.publish('stocks/request', JSON.stringify(stockRequest));
     ctx.status = 200;

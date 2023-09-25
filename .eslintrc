@@ -1,7 +1,6 @@
 {
   "extends": [
     "airbnb-base",
-<<<<<<< HEAD
     "react-app",
     "plugin:import/errors",
     "plugin:import/warnings",
@@ -88,12 +87,5 @@
     ],
     "flowtype/sort-keys": 2,
     "sort-keys-fix/sort-keys-fix": 2
-=======
-    "plugin:jest/recommended"
-  ],
-  "plugins": ["jest"],
-  "env": {
-    "jest/globals": true
->>>>>>> 22dc1b0 (feat(cli, users, prettier, eslint))
   }
 }

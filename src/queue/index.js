@@ -11,11 +11,7 @@ async function SaveStocks(stockInfo) {
     try {
       const existingStock = await stock.findOne({ where: { symbol: stockData.symbol } });
       if (existingStock) {
-<<<<<<< HEAD
         await existingStock.update({ lastUpdate: new Date(), price: stockData.price }); // Manually update updatedAt
-=======
-        await existingStock.update({ price: stockData.price, lastUpdate: new Date() }); // Manually update updatedAt
->>>>>>> 22dc1b0 (feat(cli, users, prettier, eslint))
         await stocksHistories.create({
           currency: stockData.currency,
           price: stockData.price,
