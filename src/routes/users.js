@@ -60,4 +60,25 @@ router.get('user-requests', '/requests', async (ctx) => {
   ctx.status = 200;
 });
 
+// Agregar dinero a usuario //
+
+router.put('add-money', '/add-money', async (ctx) => {
+  const { user_id: userId, money } = ctx.request.body;
+  const user = await ctx.orm.user.findByPk(userId);
+  user.money += money;
+  await user.save();
+  ctx.body = user;
+  ctx.status = 200;
+});
+
+// Conseguir acciones del usuario
+
+router.get('user-stocks', '/stocks', async (ctx) => {
+  const { user_id: userId } = ctx.request.body;
+  const user = await ctx.orm.user.findByPk(userId);
+  const stocks = await user.getStocks();
+  ctx.body = stocks;
+  ctx.status = 200;
+});
+
 module.exports = router;

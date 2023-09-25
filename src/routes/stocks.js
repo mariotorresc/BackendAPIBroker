@@ -94,19 +94,4 @@ router.post('post-stock-purchase', '/purchase', async (ctx) => {
   }
 });
 
-// Consigue todas las compañias con nombre y symbol //
-
-router.get('get-companies', '/companies', async (ctx) => {
-  const companies = await ctx.orm.stock.findAll({
-    attributes: ['symbol', 'name'], distinct: true,
-  });
-  try {
-    ctx.body = companies;
-    ctx.status = 200;
-  } catch (err) {
-    ctx.body = err.message;
-    ctx.status = 400;
-  }
-});
-
 module.exports = router;
