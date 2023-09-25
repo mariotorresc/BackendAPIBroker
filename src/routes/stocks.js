@@ -35,7 +35,6 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
       include: {
         limit: itemsPerPage,
         model: ctx.orm.stocksHistories,
-        offset: (page - 1) * itemsPerPage,
       },
       where: { symbol },
     });
@@ -45,14 +44,19 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
       ctx.body = { message: 'Stock not found' };
       return;
     }
-
+    const total = stock.stocksHistories.length;
+    const pageReports = stock.stocksHistories.slice(
+      (page - 1) * itemsPerPage,
+      itemsPerPage * page
+    );
+    const totalPages = Math.ceil(total / itemsPerPage);
     ctx.body = {
       currentPage: page,
       id: stock.id,
-      stocksHistories: stock.stocksHistories,
+      stocksHistories: pageReports,
       symbol: stock.symbol,
-      totalItems: stock.stocksHistories.length,
-      totalPages: Math.ceil(stock.stocksHistories.length / itemsPerPage),
+      totalItems: total,
+      totalPages,
     };
     ctx.status = 200;
   } catch (err) {
