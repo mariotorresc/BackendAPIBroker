@@ -1,6 +1,7 @@
 require('dotenv').config();
 const mqtt = require('mqtt');
 const { v4: uuidv4 } = require('uuid');
+const { SaveRequests } = require('./src/helpers/requests');
 
 const options = {
   host: process.env.MQTT_HOST,
@@ -40,6 +41,7 @@ function PublishNewRequest(requestInfo) {
       console.log(error);
     } else {
       console.log('Published');
+      SaveRequests(stockRequest);
     }
   });
 }
