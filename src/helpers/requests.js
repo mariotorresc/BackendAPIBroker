@@ -1,4 +1,6 @@
-const { request, stock, user, company } = require('../models');
+const {
+  request, stock, user, company
+} = require('../models');
 
 async function SaveRequests(stockRequest) {
   try {
@@ -6,22 +8,25 @@ async function SaveRequests(stockRequest) {
     const fromCompany = await company.findOne({ where: { symbol: stockRequest.symbol } });
     // get user from auth token
     // const purchaserUser = await user.findOne({ where: { id: user.id } });
-    const purchaserUser = {id: 1}; // Hardcodeado, cambiar por la linea de arriba cuando este listo el auth
+    const purchaserUser = { id: 1 };
+    // Hardcodeado, cambiar por la linea de arriba cuando este listo el auth
 
-    const newRequest = await request.create({
-      accepted: false, // cambiarle nombre a status ( string: ['accepted', 'rejected', 'processing'] )
+    await request.create({
+      // cambiarle nombre a status ( string: ['accepted', 'rejected', 'processing'] )
+      accepted: false,
+      companyId: fromCompany.id,
       depositToken: stockRequest.deposit_token,
       groupId: stockRequest.group_id,
-      rejected: false, // quitar este parametro y colocar el nuevo parametro (quantity: stockRequest.quantity) de tipo (number)
+      // colocar el nuevo parametro (quantity: stockRequest.quantity) de tipo (number)
+      // quitar este parametro
+      rejected: false,
       seller: stockRequest.seller,
-      uuid: stockRequest.request_id,
-      validated: false, // cuando se reciba la validacion actualizar a true,
-      companyId: fromCompany.id,
       stockId: purchasedStock.id,
       userId: purchaserUser.id,
+      uuid: stockRequest.request_id,
+      validated: false,
     });
     console.log('Request passed to DB!');
-    
   } catch (error) {
     console.log(error);
   }
@@ -37,9 +42,9 @@ async function ValidateRequest(validationInfo) {
       isAccepted = false;
     }
     await validatedRequest.update({
-      validated: true,
       accepted: isAccepted,
       rejected: !isAccepted,
+      validated: true,
     });
   } catch (error) {
     console.log(error);
