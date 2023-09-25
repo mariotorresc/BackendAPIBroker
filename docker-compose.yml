@@ -1,0 +1,71 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      DB_DIALECT: ${DB_DIALECT}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: 'db'
+      MQTT_HOST: ${MQTT_HOST}
+      MQTT_PORT: ${MQTT_PORT}
+      MQTT_USER: ${MQTT_USER}
+      MQTT_PASSWORD: ${MQTT_PASSWORD}
+    depends_on:
+      - db
+    command: ['yarn', 'start']
+    volumes:
+      - app-data:/app/data
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+
+  migrations:
+    build: .
+    environment:
+      DB_DIALECT: ${DB_DIALECT}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: 'db'
+    depends_on:
+      - db
+    command: ['yarn', 'migrate'] # Run migrations using the "migrate" script
+
+  mqttreceiver:
+    build: .
+    environment:
+      MQTT_HOST: ${MQTT_HOST}
+      MQTT_PORT: ${MQTT_PORT}
+      MQTT_USER: ${MQTT_USER}
+      MQTT_PASSWORD: ${MQTT_PASSWORD}
+    depends_on:
+      - db
+    command: ['node', 'mqttReceiver.js']
+    volumes:
+      - app-data:/app/data
+    
+  mqttsender:
+    build: .
+    environment:
+      MQTT_HOST: ${MQTT_HOST}
+      MQTT_PORT: ${MQTT_PORT}
+      MQTT_USER: ${MQTT_USER}
+      MQTT_PASSWORD: ${MQTT_PASSWORD}
+    depends_on:
+      - db
+    command: ['node', 'mqttSender.js']
+    volumes:
+      - app-data:/app/data
+
+volumes:
+  app-data:

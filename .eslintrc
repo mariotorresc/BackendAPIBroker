@@ -1,0 +1,91 @@
+{
+  "extends": [
+    "airbnb-base",
+    "react-app",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:jest/recommended"
+  ],
+  "plugins": ["simple-import-sort", "sort-keys-fix", "sort-class-members", "jest"],
+  "env": {
+    "jest/globals": true
+  },
+  "rules": {
+    "comma-dangle": 0,
+    "function-paren-newline": 0,
+    "import/no-unresolved": 0,
+    "lines-between-class-members": [2, "always", { "exceptAfterSingleLine": true }],
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "implicit-arrow-linebreak": 0,
+    "template-curly-spacing": "off",
+    "indent": [
+      "error",
+      2,
+      {
+        "ignoredNodes": ["TemplateLiteral"]
+      }
+    ],
+    "camelcase": ["error", { "properties": "always" }],
+    "sort-class-members/sort-class-members": [
+      2,
+      {
+        "order": [
+          "[sorted-static-properties]",
+          "[sorted-static-methods]",
+          "[properties]",
+          "constructor",
+          "[sorted-accessor-pairs]",
+          "[sorted-getters]",
+          "[sorted-setters]",
+          "[sorted-methods]",
+          "[sorted-arrow-function-properties]",
+          "[sorted-everything-else]",
+          "triggerUpdate",
+          "toJSON",
+          "saveToDatabase"
+        ],
+        "groups": {
+          "sorted-getters": [{ "kind": "get", "sort": "alphabetical" }],
+          "sorted-setters": [{ "kind": "set", "sort": "alphabetical" }],
+          "sorted-accessor-pairs": [
+            {
+              "accessorPair": true,
+              "sort": "alphabetical"
+            }
+          ],
+          "sorted-static-properties": [
+            {
+              "type": "property",
+              "static": true,
+              "sort": "alphabetical"
+            }
+          ],
+          "sorted-arrow-function-properties": [
+            {
+              "propertyType": "ArrowFunctionExpression",
+              "sort": "alphabetical"
+            }
+          ],
+          "sorted-methods": [
+            {
+              "type": "method",
+              "sort": "alphabetical"
+            }
+          ],
+          "sorted-static-methods": [
+            {
+              "type": "method",
+              "static": true,
+              "sort": "alphabetical"
+            }
+          ],
+          "sorted-everything-else": [{ "sort": "alphabetical" }]
+        },
+        "accessorPairPositioning": "getThenSet"
+      }
+    ],
+    "flowtype/sort-keys": 2,
+    "sort-keys-fix/sort-keys-fix": 2
+  }
+}
