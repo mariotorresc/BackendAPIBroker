@@ -1,5 +1,7 @@
 require('dotenv').config();
 const mqtt = require('mqtt');
+const { v4: uuidv4 } = require('uuid');
+const { SaveRequests } = require('./src/helpers/requests');
 
 const options = {
   host: process.env.MQTT_HOST,
@@ -10,10 +12,10 @@ const options = {
 
 const mqttClientSender = mqtt.connect(options);
 
-// connect to the channel stocks/request to send a purchase
+// connect to the channel stocks/requests to send a purchase
 mqttClientSender.on('connect', () => {
   console.log('Connected to MQTT SENDER broker');
-  mqttClientSender.subscribe('stocks/request');
+  mqttClientSender.subscribe('stocks/requests');
 });
 
 mqttClientSender.on('error', (error) => {
@@ -24,4 +26,26 @@ mqttClientSender.on('close', () => {
   console.log('Connection closed');
 });
 
-module.export = mqttClientSender;
+function PublishNewRequest(requestInfo) {
+  const stockRequest = {
+    request_id: uuidv4(),
+    group_id: requestInfo.groupId,
+    symbol: requestInfo.symbol,
+    datetime: new Date(),
+    deposit_token: '',
+    quantity: requestInfo.quantity,
+    seller: 0,
+  };
+  mqttClientSender.publish('stocks/requests', JSON.stringify(stockRequest), (error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Published');
+      SaveRequests(stockRequest);
+    }
+  });
+}
+
+module.exports = {
+  PublishNewRequest,
+};

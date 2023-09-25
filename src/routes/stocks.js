@@ -1,8 +1,8 @@
 /* eslint-disable radix */
 const KoaRouter = require('koa-router');
+const { PublishNewRequest } = require('../../mqttSender');
 
 const router = new KoaRouter();
-const mqttClientSender = require('../../mqttSender');
 
 router.get('get-all-stocks', '/', async (ctx) => {
   const page = parseInt(ctx.query.page) || 1;
@@ -78,13 +78,14 @@ router.post('post-stock-purchase', '/purchase', async (ctx) => {
       ctx.body = { message: 'Stock not found' };
       return;
     }
+    // validate user.money
     // send a message to the channel stocks/request
     const stockRequest = {
       groupId,
       quantity,
       symbol,
     };
-    mqttClientSender.publish('stocks/request', JSON.stringify(stockRequest));
+    PublishNewRequest(stockRequest);
     ctx.status = 200;
     ctx.body = { message: 'Purchase request sent' };
   } catch (err) {

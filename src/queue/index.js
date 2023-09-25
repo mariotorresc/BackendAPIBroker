@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable max-len */
 /* eslint-disable no-console */
-const { stock, stocksHistories } = require('../models');
+const { stock, stocksHistories, company } = require('../models');
 
 async function SaveStocks(stockInfo) {
   const stocksArray = JSON.parse(stockInfo.stocks);
@@ -22,6 +22,10 @@ async function SaveStocks(stockInfo) {
         // Create a new stock
         stockData.lastUpdate = new Date();
         const newStock = await stock.create(stockData);
+        await company.create({
+          name: stockData.shortName,
+          symbol: stockData.symbol,
+        });
         await stocksHistories.create({
           currency: stockData.currency,
           price: stockData.price,

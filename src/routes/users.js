@@ -51,4 +51,13 @@ router.post('users-create', '/register', async (ctx) => {
     });
 });
 
+// For Test Only
+router.get('user-requests', '/requests', async (ctx) => {
+  const { user_id: userId } = ctx.request.body;
+  const user = await ctx.orm.user.findByPk(userId);
+  const requests = await user.getRequests();
+  ctx.body = requests;
+  ctx.status = 200;
+});
+
 module.exports = router;
