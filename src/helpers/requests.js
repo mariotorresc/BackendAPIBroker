@@ -5,7 +5,7 @@ async function SaveRequests(stockRequest) {
     const purchasedStock = await stock.findOne({ where: { symbol: stockRequest.symbol } });
     const fromCompany = await company.findOne({ where: { symbol: stockRequest.symbol } });
     // get user from auth token
-    // const purchaserUser = await company.findOne({ where: { symbol: stockRequest.symbol } });
+    // const purchaserUser = await user.findOne({ where: { id: user.id } });
     const purchaserUser = {id: 1}; // Hardcodeado, cambiar por la linea de arriba cuando este listo el auth
 
     const newRequest = await request.create({
@@ -27,6 +27,26 @@ async function SaveRequests(stockRequest) {
   }
 }
 
+async function ValidateRequest(validationInfo) {
+  try {
+    const validatedRequest = await request.findOne({ where: { uuid: validationInfo.request_id } });
+    let isAccepted;
+    if (validationInfo.valid) {
+      isAccepted = true;
+    } else {
+      isAccepted = false;
+    }
+    await validatedRequest.update({
+      validated: true,
+      accepted: isAccepted,
+      rejected: !isAccepted,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 module.exports = {
   SaveRequests,
+  ValidateRequest,
 };

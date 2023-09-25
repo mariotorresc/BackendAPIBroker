@@ -1,6 +1,7 @@
 require('dotenv').config();
 const mqtt = require('mqtt');
 const { SaveStocks } = require('./src/queue');
+const { ValidateRequest } = require('./src/helpers/requests');
 
 const options = {
   host: process.env.MQTT_HOST,
@@ -25,8 +26,10 @@ mqttClient.on('message', (topic, message) => {
   }
   else if (topic === 'stocks/validation') {
     const validationInfo = JSON.parse(message.toString());
-    // TODO: actualizar la base de datos
-    console.log(validationInfo);
+    // actualizar la base de datos
+    if (validationInfo.group_id === 3) {
+      ValidateRequest(validationInfo);
+    }
   }
 });
 
