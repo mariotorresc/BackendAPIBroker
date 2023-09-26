@@ -41,6 +41,10 @@ module.exports = {
         allowNull: true,
         type: Sequelize.BOOLEAN,
       },
+      quantity: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
       seller: {
         allowNull: true,
         type: Sequelize.STRING(50),

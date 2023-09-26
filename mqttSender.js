@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 require('dotenv').config();
 const mqtt = require('mqtt');
 const { v4: uuidv4 } = require('uuid');
@@ -5,9 +6,9 @@ const { SaveRequests } = require('./src/helpers/requests');
 
 const options = {
   host: process.env.MQTT_HOST,
+  password: process.env.MQTT_PASSWORD,
   port: process.env.MQTT_PORT,
   username: process.env.MQTT_USER,
-  password: process.env.MQTT_PASSWORD,
 };
 
 const mqttClientSender = mqtt.connect(options);
@@ -28,13 +29,13 @@ mqttClientSender.on('close', () => {
 
 function PublishNewRequest(requestInfo) {
   const stockRequest = {
-    request_id: uuidv4(),
-    group_id: requestInfo.groupId,
-    symbol: requestInfo.symbol,
     datetime: new Date(),
     deposit_token: '',
+    group_id: requestInfo.groupId,
     quantity: requestInfo.quantity,
+    request_id: uuidv4(),
     seller: 0,
+    symbol: requestInfo.symbol,
   };
   mqttClientSender.publish('stocks/requests', JSON.stringify(stockRequest), (error) => {
     if (error) {

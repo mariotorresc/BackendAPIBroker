@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.STRING,
       },
+      quantity: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
+      },
       rejected: {
         allowNull: true,
         type: DataTypes.BOOLEAN,

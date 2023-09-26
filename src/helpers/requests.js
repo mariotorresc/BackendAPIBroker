@@ -4,7 +4,9 @@ const {
 
 async function SaveRequests(stockRequest) {
   try {
-    const purchasedStock = await stock.findOne({ where: { symbol: stockRequest.symbol } });
+    const purchasedStock = await stock.findOne({
+      where: { symbol: stockRequest.symbol },
+    });
     const fromCompany = await company.findOne({ where: { symbol: stockRequest.symbol } });
     // get user from auth token
     // const purchaserUser = await user.findOne({ where: { id: user.id } });
@@ -17,6 +19,8 @@ async function SaveRequests(stockRequest) {
       companyId: fromCompany.id,
       depositToken: stockRequest.deposit_token,
       groupId: stockRequest.group_id,
+
+      quantity: stockRequest.quantity,
       // colocar el nuevo parametro (quantity: stockRequest.quantity) de tipo (number)
       // quitar este parametro
       rejected: false,
@@ -34,7 +38,9 @@ async function SaveRequests(stockRequest) {
 
 async function ValidateRequest(validationInfo) {
   try {
-    const validatedRequest = await request.findOne({ where: { uuid: validationInfo.request_id } });
+    const validatedRequest = await request.findOne({
+      where: { uuid: validationInfo.request_id },
+    });
     let isAccepted;
     if (validationInfo.valid) {
       isAccepted = true;
