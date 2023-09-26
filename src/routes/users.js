@@ -43,22 +43,21 @@ router.post('login', '/login', async (ctx) => {
 
 router.post('user-register', '/register', async (ctx) => {
   const { email, name, lastname } = ctx.request.body;
-  try {
-    const user = await ctx.orm.user.create({
-      email,
-      lastName: lastname,
-      money: 0,
-      name,
-      password: '',
-    });
+  await ctx.orm.user.create({
+    email,
+    lastName: lastname,
+    money: 0,
+    name,
+    password: '',
+  }).then(() => {
     ctx.status = 200;
-  } catch (err) {
-    ctx.body = err.message;
-    ctx.status = 400;
-  }
+  })
+    .catch((err) => {
+      ctx.body = err.message;
+      ctx.status = 400;
+    });
 });
 
-// For Test Only
 router.get('user-requests', '/requests', async (ctx) => {
   const { user_id: userId } = ctx.request.body;
   const user = await ctx.orm.user.findByPk(userId);
