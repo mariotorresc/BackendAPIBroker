@@ -41,14 +41,21 @@ router.post('login', '/login', async (ctx) => {
   }
 });
 
-router.post('users-create', '/register', async (ctx) => {
-  await ctx.orm.user
-    .create(ctx.request.body.user)
-    .then((ctx.status = 201))
-    .catch((error) => {
-      ctx.status = 400;
-      ctx.body = error.message;
+router.post('user-register', '/register', async (ctx) => {
+  const { email, name, lastname } = ctx.request.body;
+  try {
+    const user = await ctx.orm.user.create({
+      email,
+      lastName: lastname,
+      money: 0,
+      name,
+      password: '',
     });
+    ctx.status = 200;
+  } catch (err) {
+    ctx.body = err.message;
+    ctx.status = 400;
+  }
 });
 
 // For Test Only
