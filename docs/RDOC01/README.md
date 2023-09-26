@@ -17,6 +17,8 @@ Las solicitudes de parte del usuario llegan a la API Gateway, otro servicio de A
 La API Gateway de AWS otorga una protección a la aplicación.
 Manejando los endpoints accesibles y el protocolo CORS. Utilizando Amazon Cognito, se encarga de manejar los usuarios: creación y autenticación.
 
+Para crear un usuario con autorizaciónes válidas es necesario confirmar a este desde AWS Cognito, para esto se tiene que ingresar a la cuenta de AWS, luego de haber ingresado a AWS se tiene que ir a el servicio Cognito, dentro de este escoger la user pool "Arqui-pool2", en la sección de Users verá su solicitud de confirmación, para confimar su solicitud se tiene que hacer click sobre el link bajo la columna username perteneciente a usted. Una vez realizado todo esto solo queda hacer click en el boton "Actions" que  se encuentra en la esquina superior derecha de la pagina y luego en el dropdown escoger la opción "Confirm Account" y aceptar su validación.
+
 ## Backend
 
 El backend de la aplicación es deployado en una instancia EC2. Donde todas las solicitudes primero pasan por el proxy inverso de NGINX.
