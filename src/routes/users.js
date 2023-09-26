@@ -41,17 +41,23 @@ router.post('login', '/login', async (ctx) => {
   }
 });
 
-router.post('users-create', '/register', async (ctx) => {
-  await ctx.orm.user
-    .create(ctx.request.body.user)
-    .then((ctx.status = 201))
-    .catch((error) => {
+router.post('user-register', '/register', async (ctx) => {
+  const { email, name, lastname } = ctx.request.body;
+  await ctx.orm.user.create({
+    email,
+    lastName: lastname,
+    money: 0,
+    name,
+    password: '',
+  }).then(() => {
+    ctx.status = 200;
+  })
+    .catch((err) => {
+      ctx.body = err.message;
       ctx.status = 400;
-      ctx.body = error.message;
     });
 });
 
-// For Test Only
 router.get('user-requests', '/requests', async (ctx) => {
   const { user_id: userId } = ctx.request.body;
   const user = await ctx.orm.user.findByPk(userId);

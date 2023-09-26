@@ -37,13 +37,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      rejected: {
-        allowNull: true,
-        type: Sequelize.BOOLEAN,
-      },
       quantity: {
         allowNull: false,
         type: Sequelize.INTEGER,
+      },
+      rejected: {
+        allowNull: true,
+        type: Sequelize.BOOLEAN,
       },
       seller: {
         allowNull: true,
