@@ -21,8 +21,7 @@ async function SaveRequests(stockRequest) {
       groupId: stockRequest.group_id,
 
       quantity: stockRequest.quantity,
-      // colocar el nuevo parametro (quantity: stockRequest.quantity) de tipo (number)
-      // quitar este parametro
+      // rejected, es necesario? revisar en la proxima entrega
       rejected: false,
       seller: stockRequest.seller,
       stockId: purchasedStock.id,
