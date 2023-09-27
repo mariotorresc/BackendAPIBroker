@@ -12,6 +12,8 @@ Para instalar las dependencias y correr aplicación, respectivamente. Además, e
 
 ## Backend
 
+Para que funcione se necesita crear un `.env` siguiendo el `.env.template`. Rellenando las variables de entorno faltantes.
+
 Para correr localmente el backend se necesita clonar el repositorio e instalar docker y docker compose. Luego, desde la carpeta *root* del repositorio ejecutar los comandos:
 ```
 docker compose build

@@ -1,10 +1,12 @@
 # 2023-2 / IIC2173 - E1 | Fintech Async | BACKEND
 
-El Frontend se encuentra en {url} y el Backend en {otra url}.
+- El Frontend se encuentra en con CloudFront {https://d2hwbcs7bgv1ch.cloudfront.net} y deberia estar en https://cromero.lat
+- El Backend en {url} con HTTPS 
+- La API Gateway en https://l25f2hn25d.execute-api.us-east-2.amazonaws.com/Production/ y deberia estar en https://gatewayapimariosbroker.me
 
-La documentación solicitada se encuentra en la carpeta `/docs`. 
 
 ## Consideraciones generales
+La documentación solicitada se encuentra en la carpeta `/docs`. 
 
 ## Especificaciones
 ### Requisitos funcionales
@@ -23,7 +25,7 @@ La documentación solicitada se encuentra en la carpeta `/docs`.
 - **RF04 (*Esencial*):** Logrado
 - **RF05 (*Esencial*):** Logrado
 - **RF06 (*Esencial*):** Logrado
-- **RF07:** 
+- **RF07:** Logrado
 - **RF08:** 
 - **RF09:** Logrado
 
