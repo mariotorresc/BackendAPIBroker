@@ -8,10 +8,7 @@ async function SaveRequests(stockRequest) {
       where: { symbol: stockRequest.symbol },
     });
     const fromCompany = await company.findOne({ where: { symbol: stockRequest.symbol } });
-    // get user from auth token
-    // const purchaserUser = await user.findOne({ where: { id: user.id } });
-    const purchaserUser = { id: 1 };
-    // Hardcodeado, cambiar por la linea de arriba cuando este listo el auth
+    const purchaserUser = await user.findOne({ where: { email: stockRequest.email } });
 
     await request.create({
       // cambiarle nombre a status ( string: ['accepted', 'rejected', 'processing'] )
@@ -21,8 +18,7 @@ async function SaveRequests(stockRequest) {
       groupId: stockRequest.group_id,
 
       quantity: stockRequest.quantity,
-      // colocar el nuevo parametro (quantity: stockRequest.quantity) de tipo (number)
-      // quitar este parametro
+      // rejected, es necesario? revisar en la proxima entrega
       rejected: false,
       seller: stockRequest.seller,
       stockId: purchasedStock.id,
@@ -52,6 +48,10 @@ async function ValidateRequest(validationInfo) {
       rejected: !isAccepted,
       validated: true,
     });
+    const purchaserUser = await validatedRequest.getUser();
+    // await purchaserUser.update({
+    //   wallet: 0
+    // });
   } catch (error) {
     console.log(error);
   }

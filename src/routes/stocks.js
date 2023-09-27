@@ -33,7 +33,6 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
     const stock = await ctx.orm.stock.findOne({
       attributes: ['symbol', 'id'],
       include: {
-        limit: itemsPerPage,
         model: ctx.orm.stocksHistories,
       },
       where: { symbol },
@@ -44,8 +43,9 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
       ctx.body = { message: 'Stock not found' };
       return;
     }
+    const stockHistories = stock.stocksHistories.reverse();
     const total = stock.stocksHistories.length;
-    const pageReports = stock.stocksHistories.slice(
+    const pageReports = stockHistories.slice(
       (page - 1) * itemsPerPage,
       itemsPerPage * page
     );
@@ -67,7 +67,9 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
 
 // receive a purchase from the endpoint /stocks/purchase
 router.post('post-stock-purchase', '/purchase', async (ctx) => {
-  const { symbol, quantity, groupId } = ctx.request.body;
+  const {
+    symbol, quantity, groupId, email
+  } = ctx.request.body;
   try {
     const stock = await ctx.orm.stock.findOne({
       where: { symbol },
@@ -81,6 +83,7 @@ router.post('post-stock-purchase', '/purchase', async (ctx) => {
     // validate user.money
     // send a message to the channel stocks/request
     const stockRequest = {
+      email,
       groupId,
       quantity,
       symbol,

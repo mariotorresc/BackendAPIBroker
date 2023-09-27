@@ -48,7 +48,7 @@ router.post('user-register', '/register', async (ctx) => {
     lastName: lastname,
     money: 0,
     name,
-    password: '',
+    password: 'N0tTheRe4lP4ssw0rd',
   }).then(() => {
     ctx.status = 200;
   })
@@ -59,11 +59,22 @@ router.post('user-register', '/register', async (ctx) => {
 });
 
 router.get('user-requests', '/requests', async (ctx) => {
-  const { user_id: userId } = ctx.request.body;
-  const user = await ctx.orm.user.findByPk(userId);
+  const { email } = ctx.request.body;
+  const user = await ctx.orm.user.findOne({
+    where: { email },
+  });
   const requests = await user.getRequests();
   ctx.body = requests;
   ctx.status = 200;
 });
 
+router.get('user-by-email', '/get/:email', async (ctx) => {
+  const { email } = ctx.params;
+  const user = await ctx.orm.user.findOne({
+    attributes: { exclude: ['createdAt', 'updatedAt', 'password'] },
+    where: { email },
+  });
+  ctx.body = user;
+  ctx.status = 200;
+});
 module.exports = router;
