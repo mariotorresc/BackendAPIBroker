@@ -19,15 +19,15 @@ La documentación solicitada se encuentra en la carpeta `/docs`.
 - **RF07 (*Esencial*):** Logrado
 
 ### Requisitos no funcionales
-- **RF01 (*Esencial*):** Logrado
-- **RF02 (*Esencial*):** Logrado
-- **RF03 (*Esencial*):** Logrado
-- **RF04 (*Esencial*):** Logrado
-- **RF05 (*Esencial*):** Logrado
-- **RF06 (*Esencial*):** Logrado
-- **RF07:** Logrado
-- **RF08:** 
-- **RF09:** Logrado
+- **RNF01 (*Esencial*):** Logrado
+- **RNF02 (*Esencial*):** Logrado
+- **RNF03 (*Esencial*):** Logrado
+- **RNF04 (*Esencial*):** Logrado
+- **RNF05 (*Esencial*):** Logrado
+- **RNF06 (*Esencial*):** Logrado
+- **RNF07:** Logrado
+- **RNF08:** 
+- **RNF09:** Logrado
 
 ### Documentación
 - **RDOC01**: Logrado 
