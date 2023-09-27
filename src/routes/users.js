@@ -59,22 +59,37 @@ router.post('user-register', '/register', async (ctx) => {
 });
 
 router.get('user-requests', '/requests', async (ctx) => {
-  const { email } = ctx.request.body;
+  const { email } = ctx.query ?? '';
   const user = await ctx.orm.user.findOne({
     where: { email },
   });
-  const requests = await user.getRequests();
+  const requests = await user.getRequests({
+    include: {
+      model: ctx.orm.company,
+      model: ctx.orm.stock,
+    },
+  });
   ctx.body = requests;
   ctx.status = 200;
 });
 
-router.get('user-by-email', '/get/:email', async (ctx) => {
-  const { email } = ctx.params;
+router.get('user-add-money', '/add', async (ctx) => {
+  ctx.body = {};
+  const { email } = ctx.query ?? '';
+  const amount = parseInt(ctx.query.amount) || 0;
   const user = await ctx.orm.user.findOne({
-    attributes: { exclude: ['createdAt', 'updatedAt', 'password'] },
     where: { email },
   });
-  ctx.body = user;
+  if (!user) {
+    ctx.status = 404;
+    ctx.body.message = 'No se ha encontrado al usuario'
+    return;
+  }
+  const newAmount = user.money + amount;
+  await user.update({
+    money: newAmount,
+  })
   ctx.status = 200;
+  ctx.body.wallet = newAmount;
 });
 module.exports = router;
