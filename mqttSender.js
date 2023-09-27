@@ -42,6 +42,7 @@ function PublishNewRequest(requestInfo) {
       console.log(error);
     } else {
       console.log('Published');
+      stockRequest.email = requestInfo.email;
       SaveRequests(stockRequest);
     }
   });
