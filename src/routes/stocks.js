@@ -67,7 +67,9 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
 
 // receive a purchase from the endpoint /stocks/purchase
 router.post('post-stock-purchase', '/purchase', async (ctx) => {
-  const { symbol, quantity, groupId, email } = ctx.request.body;
+  const {
+    symbol, quantity, groupId, email 
+  } = ctx.request.body;
   try {
     const stock = await ctx.orm.stock.findOne({
       where: { symbol },

@@ -71,8 +71,8 @@ router.get('user-requests', '/requests', async (ctx) => {
 router.get('user-by-email', '/get/:email', async (ctx) => {
   const { email } = ctx.params;
   const user = await ctx.orm.user.findOne({
+    attributes: { exclude: ['createdAt', 'updatedAt', 'password'] },
     where: { email },
-    attributes: {exclude: ['createdAt', 'updatedAt', 'password']}
   });
   ctx.body = user;
   ctx.status = 200;
