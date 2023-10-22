@@ -26,10 +26,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING(70),
       },
-      money: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-      },
       name: {
         allowNull: false,
         type: Sequelize.STRING(70),
