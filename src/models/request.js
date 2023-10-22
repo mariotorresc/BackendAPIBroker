@@ -4,10 +4,6 @@ module.exports = (sequelize, DataTypes) => {
   class request extends Model {}
   request.init(
     {
-      accepted: {
-        allowNull: true,
-        type: DataTypes.BOOLEAN,
-      },
       depositToken: {
         allowNull: true,
         type: DataTypes.STRING,
@@ -16,17 +12,21 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.STRING,
       },
+      priceToPay: {
+        allowNull: true,
+        type: DataTypes.FLOAT,
+      },
       quantity: {
         allowNull: false,
         type: DataTypes.INTEGER,
       },
-      rejected: {
-        allowNull: true,
-        type: DataTypes.BOOLEAN,
-      },
       seller: {
         allowNull: true,
         type: DataTypes.STRING,
+      },
+      state: {
+        allowNull: true,
+        type: DataTypes.BOOLEAN,
       },
       uuid: {
         allowNull: false,
