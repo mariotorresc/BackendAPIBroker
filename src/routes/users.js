@@ -43,15 +43,16 @@ router.post('login', '/login', async (ctx) => {
 
 router.post('user-register', '/register', async (ctx) => {
   const { email, name, lastname } = ctx.request.body;
-  await ctx.orm.user.create({
-    email,
-    lastName: lastname,
-    money: 0,
-    name,
-    password: 'N0tTheRe4lP4ssw0rd',
-  }).then(() => {
-    ctx.status = 200;
-  })
+  await ctx.orm.user
+    .create({
+      email,
+      lastName: lastname,
+      name,
+      password: 'N0tTheRe4lP4ssw0rd',
+    })
+    .then(() => {
+      ctx.status = 200;
+    })
     .catch((err) => {
       ctx.body = err.message;
       ctx.status = 400;
@@ -73,23 +74,4 @@ router.get('user-requests', '/requests', async (ctx) => {
   ctx.status = 200;
 });
 
-router.get('user-add-money', '/add', async (ctx) => {
-  ctx.body = {};
-  const { email } = ctx.query ?? '';
-  const amount = parseInt(ctx.query.amount) || 0;
-  const user = await ctx.orm.user.findOne({
-    where: { email },
-  });
-  if (!user) {
-    ctx.status = 404;
-    ctx.body.message = 'No se ha encontrado al usuario'
-    return;
-  }
-  const newAmount = user.money + amount;
-  await user.update({
-    money: newAmount,
-  })
-  ctx.status = 200;
-  ctx.body.wallet = newAmount;
-});
 module.exports = router;

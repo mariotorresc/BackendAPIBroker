@@ -3,10 +3,6 @@ module.exports = {
 
   up: (queryInterface, Sequelize) =>
     queryInterface.createTable('requests', {
-      accepted: {
-        allowNull: true,
-        type: Sequelize.BOOLEAN,
-      },
       companyId: {
         allowNull: false,
         references: {
@@ -25,7 +21,7 @@ module.exports = {
       },
       depositToken: {
         allowNull: true,
-        type: Sequelize.STRING(50),
+        type: Sequelize.STRING(100),
       },
       groupId: {
         allowNull: false,
@@ -37,17 +33,21 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      priceToPay: {
+        allowNull: true,
+        type: Sequelize.FLOAT,
+      },
       quantity: {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      rejected: {
-        allowNull: true,
-        type: Sequelize.BOOLEAN,
-      },
       seller: {
         allowNull: true,
         type: Sequelize.STRING(50),
+      },
+      state: {
+        allowNull: true,
+        type: Sequelize.BOOLEAN,
       },
       stockId: {
         allowNull: false,

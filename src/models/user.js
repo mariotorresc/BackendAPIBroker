@@ -21,10 +21,6 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: true,
         },
       },
-      money: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-      },
       name: {
         allowNull: false,
         type: DataTypes.STRING,

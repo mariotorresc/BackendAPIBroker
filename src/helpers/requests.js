@@ -10,7 +10,7 @@ async function SaveRequests(stockRequest) {
     const fromCompany = await company.findOne({ where: { symbol: stockRequest.symbol } });
     const purchaserUser = await user.findOne({ where: { email: stockRequest.email } });
 
-    await request.create({
+    const dbRequest = await request.create({
       // cambiarle nombre a status ( string: ['accepted', 'rejected', 'processing'] )
       accepted: false,
       companyId: fromCompany.id,
@@ -26,10 +26,7 @@ async function SaveRequests(stockRequest) {
       uuid: stockRequest.request_id,
       validated: false,
     });
-    await purchaserUser.update({
-      money: purchaserUser.money - Math.ceil(stockRequest.quantity * purchasedStock.price)
-    });
-    console.log('Request passed to DB!');
+    return dbRequest;
   } catch (error) {
     console.log(error);
   }
@@ -49,16 +46,12 @@ async function ValidateRequest(validationInfo) {
       isAccepted = true;
     } else {
       isAccepted = false;
-      await buyer.update({
-        money: buyer.money + Math.ceil(validatedRequest.quantity * validatedRequest.stock.price)
-      });
     }
     await validatedRequest.update({
       accepted: isAccepted,
       rejected: !isAccepted,
       validated: true,
     });
-
   } catch (error) {
     console.log(error);
   }
