@@ -35,6 +35,5 @@ jobs:
           REPOSITORY: backendapibroker
           IMAGE_TAG: latest
         run: |
-          docker build -t $ECR_PUBLIC_REPOSITORY:latest -t $ECR_PUBLIC_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_PUBLIC_REPOSITORY:latest
-          docker push $ECR_PUBLIC_REPOSITORY:$IMAGE_TAG
+          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
