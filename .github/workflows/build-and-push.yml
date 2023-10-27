@@ -3,7 +3,7 @@ name: Build and Push to ECR
 on:
   push:
     branches:
-      - main
+      - Webpay
 permissions:
   id-token: write
   contents: read
@@ -19,7 +19,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::515833118963:role/mariotorresc-github-actions-BackendAPIBroker
-          aws-region: us-east-2
+          aws-region: us-east-1
 
       - name: Login to Amazon ECR Public
         id: login-ecr-public
