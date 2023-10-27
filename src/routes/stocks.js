@@ -145,11 +145,6 @@ router.post('/post-stock-purchase', '/purchase', async (ctx) => {
     );
 
     // Update DB request with deposit token
-    console.log('--------------------------------------------');
-    console.log('--------------------------------------------');
-    console.log('--------------------------------------------');
-    console.log('--------------------------------------------');
-    console.log(trx.token);
     await request.update({ depositToken: trx.token });
     stockRequest.deposit_token = trx.token;
 

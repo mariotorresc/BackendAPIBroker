@@ -11,7 +11,8 @@
     "migrate-undo": "yarn sequelize db:migrate:undo:all",
     "migrate": "yarn sequelize db:migrate",
     "test": "jest",
-    "seeds": "yarn sequelize db:seed:all"
+    "seeds": "yarn sequelize db:seed:all",
+    "migrate-and-seed": "yarn migrate && yarn seeds"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
