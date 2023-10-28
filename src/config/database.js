@@ -2,14 +2,14 @@ require('dotenv').config();
 
 const config = {
   default: {
-    database: process.env.DB_NAME,
-    dialect: process.env.DB_DIALECT || 'postgres',
-    host: process.env.DB_HOST || '127.0.0.1',
+    database: 'brokerdb',
+    dialect: 'postgres',
+    host: 'db',
     password: process.env.DB_PASSWORD,
     username: process.env.DB_USERNAME,
   },
   development: {
-    database: process.env.DB_NAME || 'iic2513template_dev',
+    database: 'brokerdb',
     extend: 'default',
   },
   production: {

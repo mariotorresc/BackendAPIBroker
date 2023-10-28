@@ -5,8 +5,6 @@ services:
     ports:
       - '3000:3000'
     environment:
-      DB_DIALECT: ${DB_DIALECT}
-      DB_PORT: ${DB_PORT}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
@@ -27,16 +25,16 @@ services:
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_DB: brokerdb
 
   migrations:
     image: public.ecr.aws/b1r2y5q5/backendapibroker:latest
     environment:
-      DB_DIALECT: ${DB_DIALECT}
-      DB_PORT: ${DB_PORT}
+      DB_DIALECT: postgres
+      DB_PORT: 5432
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
+      DB_NAME: brokerdb
       DB_HOST: 'db'
     depends_on:
       - db
