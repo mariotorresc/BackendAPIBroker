@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /home/ubuntu/
-sudo docker-compose --file docker-compose.production.yml down
+docker-compose --file docker-compose.production.yml down
