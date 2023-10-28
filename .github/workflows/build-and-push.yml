@@ -63,8 +63,8 @@ jobs:
             deploymentId=$( aws deploy create-deployment --application-name api-codedeploy \
             --deployment-group-name deploy-group \
             --s3-location bucket=codedeploy-bucket-backendapibroker,key=deploy.zip,bundleType=zip \
-            --file-exists-behavior OVERWRITE | | jq -r '.deploymentId' )
-            echo "DeploymentId: $deploymentId" >> $GITHUB_OUTPUT
+            --description "AUTOMATIC DEPLOYMENT FROM GITHUB COMMIT ${{github.sha}}" | jq -r '.deploymentId' )
+            echo "deploymentId=$deploymentId" >> $GITHUB_OUTPUT
         
       - name: Wait for Codedeploy Deploy
         run: aws deploy wait deployment-successful --deployment-id ${{steps.codedeploy-deploy-trigger.outputs.deploymentId}}
