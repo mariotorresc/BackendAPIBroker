@@ -41,7 +41,7 @@ async function SaveExternalRequests(requestInfo) {
       companyId: Company.id,
       depositToken: requestInfo.deposit_token,
       groupId: requestInfo.group_id,
-      priceToPay: stock.price,
+      priceToPay: purchasedStock.price,
       quantity: requestInfo.quantity,
       seller: requestInfo.seller,
       state: null,
