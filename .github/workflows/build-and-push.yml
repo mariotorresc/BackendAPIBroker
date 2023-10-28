@@ -51,11 +51,12 @@ jobs:
           role-to-assume: arn:aws:iam::515833118963:role/mariotorresc-github-actions-BackendAPIBroker
           aws-region: us-east-1
 
-      - name: Zip the file
+      - name: Zip Artifacts to deploy
         run: zip -r deploy.zip scripts/ appspec.yml docker-compose.production.yml
 
       - name: Upload the zip to S3
-        run: aws s3 cp deploy.zip s3://codedeploy-bucket-backendapibroker
+        run: zip -r deploy.zip scripts/ appspec.yml docker-compose.production.yml |
+          aws s3 cp deploy.zip s3://codedeploy-bucket-backendapibroker/deploy.zip
 
       - name: Create Codedeploy Deployment
         id: codedeploy-deploy-trigger
