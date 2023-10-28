@@ -11,19 +11,43 @@ async function SaveRequests(stockRequest) {
     const purchaserUser = await user.findOne({ where: { email: stockRequest.email } });
 
     const dbRequest = await request.create({
-      // cambiarle nombre a status ( string: ['accepted', 'rejected', 'processing'] )
-      accepted: false,
       companyId: fromCompany.id,
       depositToken: stockRequest.deposit_token,
       groupId: stockRequest.group_id,
-
+      priceToPay: stock.price,
       quantity: stockRequest.quantity,
-      // rejected, es necesario? revisar en la proxima entrega
-      rejected: false,
       seller: stockRequest.seller,
+      state: null,
       stockId: purchasedStock.id,
       userId: purchaserUser.id,
       uuid: stockRequest.request_id,
+      validated: false,
+    });
+    return dbRequest;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function SaveExternalRequests(requestInfo) {
+  try {
+    const purchasedStock = await stock.findOne({
+      where: { symbol: requestInfo.symbol },
+    });
+    const Company = await company.findOne({ where: { symbol: requestInfo.symbol } });
+    const dummy = await user.findOne({ where: { email: 'foo@uc.cl' } });
+
+    const dbRequest = await request.create({
+      companyId: Company.id,
+      depositToken: requestInfo.deposit_token,
+      groupId: requestInfo.group_id,
+      priceToPay: stock.price,
+      quantity: requestInfo.quantity,
+      seller: requestInfo.seller,
+      state: null,
+      stockId: purchasedStock.id,
+      userId: dummy.id,
+      uuid: requestInfo.request_id,
       validated: false,
     });
     return dbRequest;
@@ -40,16 +64,8 @@ async function ValidateRequest(validationInfo) {
       },
       where: { uuid: validationInfo.request_id },
     });
-    const buyer = await validatedRequest.getUser();
-    let isAccepted;
-    if (validationInfo.valid) {
-      isAccepted = true;
-    } else {
-      isAccepted = false;
-    }
     await validatedRequest.update({
-      accepted: isAccepted,
-      rejected: !isAccepted,
+      state: validationInfo.valid,
       validated: true,
     });
   } catch (error) {
@@ -59,5 +75,6 @@ async function ValidateRequest(validationInfo) {
 
 module.exports = {
   SaveRequests,
+  SaveExternalRequests,
   ValidateRequest,
 };
