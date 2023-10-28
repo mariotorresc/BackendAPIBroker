@@ -51,7 +51,7 @@ services:
       DB_NAME: ${DB_NAME}
       DB_HOST: 'db'
     depends_on:
-      - db
+      - migrations
     command: ['yarn', 'seeds'] # Run seeds using the "seed" script
 
   mqttreceiver:
