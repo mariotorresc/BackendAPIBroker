@@ -70,6 +70,36 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
   }
 });
 
+router.get('get-all-purchases-seven-days', '/:symbol/purchases', async (ctx) => {
+  const { symbol } = ctx.params;
+  try {
+    const stock = await ctx.orm.stock.findOne({
+      attributes: ['symbol', 'id'],
+      include: {
+        model: ctx.orm.stocksHistories,
+      },
+      where: { symbol },
+    });
+
+    if (!stock) {
+      ctx.status = 404;
+      ctx.body = { message: 'Stock not found' };
+      return;
+    }
+
+    // Falta acortarlo a siete dias (Camilo)
+    const purchases = await ctx.orm.request.findAndCountAll({
+      where: { state: true, stockId: stock.id }
+    })
+
+    ctx.status = 200;
+    ctx.body = purchases;
+  } catch (err) {
+    ctx.body = err.message;
+    ctx.status = 400;
+  }
+});
+
 // receive a purchase from the endpoint /stocks/purchase
 router.post('/post-stock-purchase', '/purchase', async (ctx) => {
   const { symbol, quantity, groupId, email, priceToPay } = ctx.request.body;
