@@ -64,12 +64,10 @@ jobs:
           DEPLOYMENT_GROUP_NAME: deploy-group
           DEPLOYMENT_BUCKET_NAME: codedeploy-bucket-backendapibroker
         run: |
-          deploymentId=$( aws deploy create-deployment \
+           aws deploy create-deployment \
             --application-name $DEPLOYMENT_APPLICATION_NAME \
             --deployment-group-name $DEPLOYMENT_GROUP_NAME \
-            --s3-location bucket=$DEPLOYMENT_BUCKET_NAME,key=deploy.zip,bundleType=zip \
-            --description "Automatic deployment from github commit ${{github.sha}}" | jq -r '.deploymentId' )
-          echo "deploymentId=$deploymentId" >> $GITHUB_OUTPUT
+            --s3-location bucket=$DEPLOYMENT_BUCKET_NAME,key=deploy.zip,bundleType=zip
 
       - name: Wait until deployment is done
         run: aws deploy wait deployment-successful --deployment-id ${{steps.codedeploy-deploy-trigger.outputs.deploymentId}}
