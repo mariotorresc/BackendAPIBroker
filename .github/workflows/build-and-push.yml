@@ -55,9 +55,9 @@ jobs:
         run: zip -r deploy.zip scripts/ appspec.yml docker-compose.production.yml
 
       - name: Upload the zip to S3
-        run: aws s3 cp deploy.zip s3://codedeploy-bucket-backendapibroker 
-      
-      - name: Create Codedeploy Deploy
+        run: aws s3 cp deploy.zip s3://codedeploy-bucket-backendapibroker
+
+      - name: Create Codedeploy Deployment
         id: codedeploy-deploy-trigger
         env:
           DEPLOYMENT_APPLICATION_NAME: api-codedeploy
@@ -71,8 +71,5 @@ jobs:
             --description "Automatic deployment from github commit ${{github.sha}}" | jq -r '.deploymentId' )
           echo "deploymentId=$deploymentId" >> $GITHUB_OUTPUT
 
-      - name: Wait for Codedeploy Deploy
+      - name: Wait until deployment is done
         run: aws deploy wait deployment-successful --deployment-id ${{steps.codedeploy-deploy-trigger.outputs.deploymentId}}
-            
-        
-
