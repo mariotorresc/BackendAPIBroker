@@ -58,6 +58,16 @@ jobs:
         run: aws s3 cp deploy.zip s3://codedeploy-bucket-backendapibroker 
       
       - name: Create Codedeploy Deploy
-        run: aws deploy create-deployment --application-name api-codedeploy --deployment-group-name deploy-group --s3-location bucket=codedeploy-bucket-backendapibroker,key=deploy.zip,bundleType=zip --file-exists-behavior OVERWRITE
+        id: codedeploy-deploy-trigger
+        run: | 
+            deploymentId=$( aws deploy create-deployment --application-name api-codedeploy \
+            --deployment-group-name deploy-group \
+            --s3-location bucket=codedeploy-bucket-backendapibroker,key=deploy.zip,bundleType=zip \
+            --file-exists-behavior OVERWRITE | | jq -r '.deploymentId' )
+            echo "DeploymentId: $deploymentId" >> $GITHUB_OUTPUT
+        
+      - name: Wait for Codedeploy Deploy
+        run: aws deploy wait deployment-successful --deployment-id ${{steps.codedeploy-deploy-trigger.outputs.deploymentId}}
+            
         
 
