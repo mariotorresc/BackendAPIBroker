@@ -59,13 +59,18 @@ jobs:
       
       - name: Create Codedeploy Deploy
         id: codedeploy-deploy-trigger
-        run: | 
-            deploymentId=$(aws deploy create-deployment --application-name api-codedeploy \
-              --deployment-group-name deploy-group \
-              --s3-location bucket=codedeploy-bucket-backendapibroker,key=deploy.zip,bundleType=zip \
-              --description "AUTOMATIC DEPLOYMENT FROM GITHUB COMMIT ${{github.sha}}" | jq -r '.deploymentId' )
-            echo "deploymentId=$deploymentId" >> $GITHUB_OUTPUT
-        
+        env:
+          DEPLOYMENT_APPLICATION_NAME: api-codedeploy
+          DEPLOYMENT_GROUP_NAME: deploy-group
+          DEPLOYMENT_BUCKET_NAME: codedeploy-bucket-backendapibroker
+        run: |
+          deploymentId=$( aws deploy create-deployment \
+            --application-name $DEPLOYMENT_APPLICATION_NAME \
+            --deployment-group-name $DEPLOYMENT_GROUP_NAME \
+            --s3-location bucket=$DEPLOYMENT_BUCKET_NAME,key=deploy.zip,bundleType=zip \
+            --description "Automatic deployment from github commit ${{github.sha}}" | jq -r '.deploymentId' )
+          echo "deploymentId=$deploymentId" >> $GITHUB_OUTPUT
+
       - name: Wait for Codedeploy Deploy
         run: aws deploy wait deployment-successful --deployment-id ${{steps.codedeploy-deploy-trigger.outputs.deploymentId}}
             
