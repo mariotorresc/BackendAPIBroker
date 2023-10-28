@@ -64,10 +64,10 @@ jobs:
           DEPLOYMENT_GROUP_NAME: deploy-group
           DEPLOYMENT_BUCKET_NAME: codedeploy-bucket-backendapibroker
         run: |
-           aws deploy create-deployment \
-            --application-name $DEPLOYMENT_APPLICATION_NAME \
-            --deployment-group-name $DEPLOYMENT_GROUP_NAME \
-            --s3-location bucket=$DEPLOYMENT_BUCKET_NAME,key=deploy.zip,bundleType=zip
+          aws deploy create-deployment \
+           --application-name $DEPLOYMENT_APPLICATION_NAME \
+           --deployment-group-name $DEPLOYMENT_GROUP_NAME \
+           --s3-location bucket=$DEPLOYMENT_BUCKET_NAME,key=deploy.zip,bundleType=zip --region us-east-2
 
       - name: Wait until deployment is done
         run: aws deploy wait deployment-successful --deployment-id ${{steps.codedeploy-deploy-trigger.outputs.deploymentId}}
