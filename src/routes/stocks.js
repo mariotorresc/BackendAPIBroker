@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const { PublishNewRequest, PublishValidation } = require('../../mqttSender');
 const tx = require('../utils/trx');
 const { SaveRequests } = require('../helpers/requests');
+const { Op } = require('sequelize');
 require('dotenv').config();
 
 const router = new KoaRouter();
@@ -75,9 +76,6 @@ router.get('get-all-purchases-seven-days', '/:symbol/purchases', async (ctx) => 
   try {
     const stock = await ctx.orm.stock.findOne({
       attributes: ['symbol', 'id'],
-      include: {
-        model: ctx.orm.stocksHistories,
-      },
       where: { symbol },
     });
 
@@ -89,8 +87,15 @@ router.get('get-all-purchases-seven-days', '/:symbol/purchases', async (ctx) => 
 
     // Falta acortarlo a siete dias (Camilo)
     const purchases = await ctx.orm.request.findAndCountAll({
-      where: { state: true, stockId: stock.id }
-    })
+      where: {
+        state: true,
+        stockId: stock.id,
+        createdAt: {
+          [Op.lt]: new Date(),
+          [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000 * 7)
+        }
+      },
+    });
 
     ctx.status = 200;
     ctx.body = purchases;

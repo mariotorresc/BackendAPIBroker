@@ -69,6 +69,7 @@ async function ValidateRequest(validationInfo) {
       validated: true,
     });
   } catch (error) {
+    console.log(`Error al validar`);
     console.log(error);
   }
 }
