@@ -58,7 +58,6 @@ jobs:
         run: aws s3 cp deploy.zip s3://codedeploy-bucket-backendapibroker 
       
       - name: Create Codedeploy Deploy
-        run: aws deploy create-deployment --application-name api-codedeploy --deployment-group-name deploy-group \
-             --s3-location bucket=codedeploy-bucket-backendapibroker,key=deploy.zip,bundleType=zip --file-exists-behavior OVERWRITE
-
+        run: aws deploy create-deployment --application-name api-codedeploy --deployment-group-name deploy-group --s3-location bucket=codedeploy-bucket-backendapibroker,key=deploy.zip,bundleType=zip --file-exists-behavior OVERWRITE
+        
 
