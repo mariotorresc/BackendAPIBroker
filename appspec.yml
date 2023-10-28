@@ -8,7 +8,7 @@ files:
 
 hooks:
   ApplicationStop:
-    - location: ./scripts/application-stop.sh
+    - location: ./scripts/1.sh
       timeout: 10000
   AfterInstall:
     - location: ./scripts/after-install.sh
