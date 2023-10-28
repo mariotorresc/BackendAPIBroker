@@ -68,7 +68,7 @@ jobs:
           deploymentId=$( aws deploy create-deployment \
             --application-name $DEPLOYMENT_APPLICATION_NAME \
             --deployment-group-name $DEPLOYMENT_GROUP_NAME \
-            --s3-location bucket=$DEPLOYMENT_BUCKET_NAME,key=deploy.zip,bundleType=zip --region us-east-2 \
+            --s3-location bucket=$DEPLOYMENT_BUCKET_NAME,key=deploy.zip,bundleType=zip --file-exists-behavior OVERWRITE --region us-east-2 \
             --description "Automatic deployment from github commit ${{github.sha}}" | jq -r '.deploymentId' )
           echo "deploymentId=$deploymentId" >> $GITHUB_OUTPUT
 
