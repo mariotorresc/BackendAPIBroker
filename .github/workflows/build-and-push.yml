@@ -56,7 +56,7 @@ jobs:
 
       - name: Upload the zip to S3
         run: zip -r deploy.zip scripts/ appspec.yml docker-compose.production.yml |
-          aws s3 cp deploy.zip s3://codedeploy-bucket-backendapibroker/deploy.zip --file-exists-behavior OVERWRITE --region us-east-2
+          aws s3 cp deploy.zip s3://codedeploy-bucket-backendapibroker/deploy.zip --region us-east-2
 
       - name: Create Codedeploy Deployment
         id: codedeploy-deploy-trigger
