@@ -69,6 +69,7 @@ router.get('user-requests', '/requests', async (ctx) => {
       model: ctx.orm.company,
       model: ctx.orm.stock,
     },
+    order: [['createdAt', 'DESC']],
   });
   ctx.body = requests;
   ctx.status = 200;
