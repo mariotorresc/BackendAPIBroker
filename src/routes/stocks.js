@@ -2,10 +2,10 @@
 /* eslint-disable radix */
 const KoaRouter = require('koa-router');
 const { v4: uuidv4 } = require('uuid');
+const { Op } = require('sequelize');
 const { PublishNewRequest, PublishValidation } = require('../../mqttSender');
 const tx = require('../utils/trx');
 const { SaveRequests } = require('../helpers/requests');
-const { Op } = require('sequelize');
 require('dotenv').config();
 
 const router = new KoaRouter();
@@ -17,6 +17,7 @@ router.get('get-all-stocks', '/', async (ctx) => {
     const { count, rows } = await ctx.orm.stock.findAndCountAll({
       limit: itemsPerPage,
       offset: (page - 1) * itemsPerPage,
+      order: [['lastUpdate', 'DESC']],
     });
     ctx.body = {
       currentPage: page,
@@ -88,12 +89,12 @@ router.get('get-all-purchases-seven-days', '/:symbol/purchases', async (ctx) => 
     // Falta acortarlo a siete dias (Camilo)
     const purchases = await ctx.orm.request.findAndCountAll({
       where: {
-        state: true,
-        stockId: stock.id,
         createdAt: {
           [Op.lt]: new Date(),
-          [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000 * 7)
-        }
+          [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000 * 7),
+        },
+        state: true,
+        stockId: stock.id,
       },
     });
 
