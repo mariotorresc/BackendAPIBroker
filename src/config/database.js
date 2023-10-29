@@ -4,7 +4,7 @@ const config = {
   default: {
     database: process.env.DB_NAME,
     dialect: process.env.DB_DIALECT || 'postgres',
-    host: process.env.DB_HOST || '127.0.0.1',
+    host: 'db',
     password: process.env.DB_PASSWORD,
     username: process.env.DB_USERNAME,
   },
