@@ -2,11 +2,20 @@ require('dotenv').config();
 
 const config = {
   default: {
-    database: process.env.DB_NAME || 'brokerdb',
-    dialect: process.env.DB_DIALECT || 'postgres',
+    database: 'brokerdb',
+    dialect: 'postgres',
     host: 'db',
-    password: process.env.DB_PASSWORD || 'mypassword',
-    username: process.env.DB_USERNAME || 'myuser',
+    password: 'mypassword',
+    username: 'myuser',
+  },
+  development: {
+    extend: 'default',
+  },
+  production: {
+    extend: 'default',
+  },
+  test: {
+    extend: 'default',
   },
 };
 
