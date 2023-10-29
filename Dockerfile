@@ -9,7 +9,7 @@ COPY package.json ./
 # COPY yarn.lock ./
 
 # Install dependencies
-RUN yarn install --production
+RUN yarn install
 
 # Copy the rest of the files
 COPY . .
