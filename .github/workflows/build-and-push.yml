@@ -58,6 +58,22 @@ jobs:
         run: zip -r deploy.zip scripts/ appspec.yml docker-compose.production.yml |
           aws s3 cp deploy.zip s3://codedeploy-bucket-backendapibroker
 
+      - name: Set up Docker Compose environment
+        run: |
+          echo "DB_DIALECT=${{ secrets.DB_DIALECT }}" >> .env
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "MQTT_HOST=${{ secrets.MQTT_HOST }}" >> .env
+          echo "MQTT_PORT=${{ secrets.MQTT_PORT }}" >> .env
+          echo "MQTT_USER=${{ secrets.MQTT_USER }}" >> .env
+          echo "MQTT_PASSWORD=${{ secrets.MQTT_PASSWORD }}" >> .env
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+          echo "REDIRECT_URL=${{ secrets.REDIRECT_URL }}" >> .env
+
       - name: Create Codedeploy Deployment
         id: codedeploy-deploy-trigger
         env:
