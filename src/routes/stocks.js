@@ -72,9 +72,50 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
   }
 });
 
-router.get('get-all-purchases-seven-days', '/:symbol/purchases', async (ctx) => {
-  const { symbol } = ctx.params;
+// router.get('get-all-purchases-seven-days', '/:symbol/purchases', async (ctx) => {
+//   const { symbol } = ctx.params;
+//   try {
+//     const stock = await ctx.orm.stock.findOne({
+//       attributes: ['symbol', 'id'],
+//       where: { symbol },
+//     });
+
+//     if (!stock) {
+//       ctx.status = 404;
+//       ctx.body = { message: 'Stock not found' };
+//       return;
+//     }
+
+//     // Falta acortarlo a siete dias (Camilo)
+//     const purchases = await ctx.orm.request.findAndCountAll({
+//       where: {
+//         state: true,
+//         stockId: stock.id,
+//         createdAt: {
+//           [Op.lt]: new Date(),
+//           [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000 * 7)
+//         }
+//       },
+//     });
+
+//     ctx.status = 200;
+//     ctx.body = purchases;
+//   } catch (err) {
+//     ctx.body = err.message;
+//     ctx.status = 400;
+//   }
+// }); 
+
+router.get('/get-simulation', '/prediction/get', async (ctx) => {
+  // const { symbol } = ctx.params;
+  const { quantity, symbol, time } = ctx.query;
   try {
+    mensaje = {"message": "bien"}
+    console.log(`bien. El mensaje es ${symbol} ${time} ${quantity}`)
+    ctx.status = 200;
+    ctx.body = mensaje;
+
+    // ir a buscar el N
     const stock = await ctx.orm.stock.findOne({
       attributes: ['symbol', 'id'],
       where: { symbol },
@@ -85,7 +126,6 @@ router.get('get-all-purchases-seven-days', '/:symbol/purchases', async (ctx) => 
       ctx.body = { message: 'Stock not found' };
       return;
     }
-
     const purchases = await ctx.orm.request.findAndCountAll({
       where: {
         createdAt: {
@@ -97,18 +137,65 @@ router.get('get-all-purchases-seven-days', '/:symbol/purchases', async (ctx) => 
       },
     });
 
-    ctx.status = 200;
-    ctx.body = purchases;
+    console.log(`Las purchases son ${purchases}`);
+
+    // ir a buscar el historial de precios de la stock desde 
+    // el tiempo atrás que el usuario indica
+    const days = time || 7;
+    let finish = false;
+    let stockHistories = [];
+    let offset = 0;
+    const limit = 100;
+
+    while (!finish) {
+      const rows = await ctx.orm.stocksHistories.findAll({
+        attributes: {
+          exclude: ['id', 'currency', 'source', 'stockId', 'updatedAt', 'deletedAt']
+        },
+        limit: limit,
+        offset: limit * offset,
+        where: {
+          createdAt: {
+            [Op.lt]: new Date(),
+            [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000 * days),
+          },
+          stockId: stock.id
+        },
+      });
+      stockHistories = stockHistories.concat(rows);
+      console.log(`\nNumero ${offset + 1} de iteración (${rows.length} rows)\n`);
+      offset++;
+      if (rows.length < limit) {
+        finish = true;
+      }
+    }
+
+    pricesAndDates = {};
+    pricesAndDates.rows = stockHistories;
+    pricesAndDates.length = stockHistories.length;
+
+    console.log("Price and dates:", pricesAndDates);
+
+
+
+    details = {
+      "quantity": quantity,
+      "symbol": symbol,
+      "time": time,
+      "N": purchases["count"],
+      "actual_date": new Date(),
+      "pricesAndDates": pricesAndDates
+    }
+
+    // enviar details a los workers
+    // post 
+    
+
+
   } catch (err) {
     ctx.body = err.message;
     ctx.status = 400;
   }
-});
-
-router.get('/get-simulation', '/simulate/:symbol/:time/:quantity', async (ctx) => {
-  // const {} = ctx.request
-  console.log("hola")
-  // console.log("llego el mensaje: ", ctx.body)
 });
 
 // receive a purchase from the endpoint /stocks/purchase
