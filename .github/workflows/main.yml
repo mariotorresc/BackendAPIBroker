@@ -12,7 +12,7 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_DB: ${{ env.DB_NAME }}
+          POSTGRES_DB: brokerdb
           POSTGRES_USER: ${{ env.DB_USERNAME }}
           POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
         ports:
@@ -45,7 +45,7 @@ jobs:
 
       - name: Wait for PostgreSQL to start
         run: |
-          until nc -z -v -w30 ${{ env.DB_HOST }} ${{ env.DB_PORT }}
+          until nc -z -v -w30 db 5432
           do
             echo "Waiting for PostgreSQL to start..."
             sleep 5

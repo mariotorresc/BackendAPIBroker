@@ -11,7 +11,8 @@
     "migrate-undo": "yarn sequelize db:migrate:undo:all",
     "migrate": "yarn sequelize db:migrate",
     "test": "jest",
-    "seeds": "yarn sequelize db:seed:all"
+    "seeds": "yarn sequelize db:seed:all",
+    "migrate-and-seed": "yarn migrate && yarn seeds"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
@@ -43,9 +44,6 @@
     "koa-webpack": "^6.0.0",
     "mini-css-extract-plugin": "^0.11.1",
     "nodemon": "^2.0.4",
-    "pg": "^8.11.3",
-    "pg-hstore": "^2.3.4",
-    "pg-pool": "^3.6.1",
     "prettier": "^3.0.3",
     "prop-types": "^15.8.1",
     "react-test-renderer": "^16.13.1",
@@ -82,10 +80,12 @@
     "koa-router": "^9.4.0",
     "koa-session": "^6.0.0",
     "koa-static": "^5.0.0",
+    "koa-webpack": "^6.0.0",
     "mercadopago": "^1.5.9",
     "mqtt": "^5.0.3",
     "mysql2": "^2.2.5",
     "nodemailer": "^6.6.3",
+    "pg": "^8.11.3",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
