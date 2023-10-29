@@ -12,6 +12,15 @@ module.exports = {
       password: 'ANotSoSecurePassword',
       updatedAt: new Date(),
     });
+    // User for External requests
+    usersArray.push({
+      createdAt: new Date(),
+      email: 'foo@uc.cl',
+      lastName: 'Requests',
+      name: 'External',
+      password: 'ANotSoSecurePassword',
+      updatedAt: new Date(),
+    });
     return queryInterface.bulkInsert('users', usersArray);
   },
 };

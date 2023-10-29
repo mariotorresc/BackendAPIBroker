@@ -1,11 +1,12 @@
 # Use a base image
-FROM node:16
+FROM node:16-alpine
 
 # Set the working directory
 WORKDIR /app
 
 # Copy package.json and yarn.lock
-COPY package*.json ./
+COPY package.json ./
+# COPY yarn.lock ./
 
 # Install dependencies
 RUN yarn install
@@ -17,4 +18,4 @@ COPY . .
 EXPOSE 3000
 
 # Custom script to wait for the database and run migrations
-CMD ["./start.sh"]
+CMD ["node", "index.js"]

@@ -1,7 +1,7 @@
 version: '3'
 services:
   app:
-    build: .
+    image: public.ecr.aws/b1r2y5q5/backendapibroker:latest
     ports:
       - '3000:3000'
     environment:
@@ -28,7 +28,7 @@ services:
       POSTGRES_DB: brokerdb
 
   migrations:
-    build: .
+    image: public.ecr.aws/b1r2y5q5/backendapibroker:latest
     environment:
       DB_DIALECT: postgres
       DB_PORT: 5432
@@ -41,7 +41,7 @@ services:
     command: ['yarn', 'migrate-and-seed'] # Run migrations using the "migrate" script
 
   mqttreceiver:
-    build: .
+    image: public.ecr.aws/b1r2y5q5/backendapibroker:latest
     environment:
       MQTT_HOST: ${MQTT_HOST}
       MQTT_PORT: ${MQTT_PORT}
@@ -54,7 +54,7 @@ services:
       - app-data:/app/data
 
   mqttsender:
-    build: .
+    image: public.ecr.aws/b1r2y5q5/backendapibroker:latest
     environment:
       MQTT_HOST: ${MQTT_HOST}
       MQTT_PORT: ${MQTT_PORT}

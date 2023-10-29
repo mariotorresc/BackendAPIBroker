@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const { PublishNewRequest, PublishValidation } = require('../../mqttSender');
 const tx = require('../utils/trx');
 const { SaveRequests } = require('../helpers/requests');
+const { Op } = require('sequelize');
 require('dotenv').config();
 
 const router = new KoaRouter();
@@ -70,6 +71,40 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
   }
 });
 
+router.get('get-all-purchases-seven-days', '/:symbol/purchases', async (ctx) => {
+  const { symbol } = ctx.params;
+  try {
+    const stock = await ctx.orm.stock.findOne({
+      attributes: ['symbol', 'id'],
+      where: { symbol },
+    });
+
+    if (!stock) {
+      ctx.status = 404;
+      ctx.body = { message: 'Stock not found' };
+      return;
+    }
+
+    // Falta acortarlo a siete dias (Camilo)
+    const purchases = await ctx.orm.request.findAndCountAll({
+      where: {
+        state: true,
+        stockId: stock.id,
+        createdAt: {
+          [Op.lt]: new Date(),
+          [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000 * 7)
+        }
+      },
+    });
+
+    ctx.status = 200;
+    ctx.body = purchases;
+  } catch (err) {
+    ctx.body = err.message;
+    ctx.status = 400;
+  }
+});
+
 // receive a purchase from the endpoint /stocks/purchase
 router.post('/post-stock-purchase', '/purchase', async (ctx) => {
   const { symbol, quantity, groupId, email, priceToPay } = ctx.request.body;
@@ -110,11 +145,6 @@ router.post('/post-stock-purchase', '/purchase', async (ctx) => {
     );
 
     // Update DB request with deposit token
-    console.log('--------------------------------------------');
-    console.log('--------------------------------------------');
-    console.log('--------------------------------------------');
-    console.log('--------------------------------------------');
-    console.log(trx.token);
     await request.update({ depositToken: trx.token });
     stockRequest.deposit_token = trx.token;
 
