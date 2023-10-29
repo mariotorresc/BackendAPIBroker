@@ -7,7 +7,7 @@ files:
     destination: /home/ubuntu/scripts
 
 hooks:
-  ApplicationStop:
+  1ss:
     - location: ./scripts/1.sh
       timeout: 10000
   AfterInstall:
