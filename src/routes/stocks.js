@@ -105,6 +105,12 @@ router.get('get-all-purchases-seven-days', '/:symbol/purchases', async (ctx) => 
   }
 });
 
+router.get('/get-simulation', '/simulate/:symbol/:time/:quantity', async (ctx) => {
+  // const {} = ctx.request
+  console.log("hola")
+  // console.log("llego el mensaje: ", ctx.body)
+});
+
 // receive a purchase from the endpoint /stocks/purchase
 router.post('/post-stock-purchase', '/purchase', async (ctx) => {
   const { symbol, quantity, groupId, email, priceToPay } = ctx.request.body;
