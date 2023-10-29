@@ -31,7 +31,7 @@ services:
     build: .
     environment:
       DB_DIALECT: $DB_DIALECT}
-      DB_PORT: $DB_PORT}
+      DB_PORT: ${DB_PORT}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
