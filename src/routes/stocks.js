@@ -86,7 +86,6 @@ router.get('get-all-purchases-seven-days', '/:symbol/purchases', async (ctx) => 
       return;
     }
 
-    // Falta acortarlo a siete dias (Camilo)
     const purchases = await ctx.orm.request.findAndCountAll({
       where: {
         createdAt: {
