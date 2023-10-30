@@ -51,7 +51,7 @@ Del tercer tópico recibe las validaciones de las solicitudes de compra. Para es
 
 ### Job Master
 
-Consiste en una aplicación en python (FastAPI) que recibe instrucciones del **Backend Service** y mediante el **Broker** coordina **Worker**s para realizar las tareas solicitadas. Además, expone otro endpoint para saber si es servicio está activo y otro para conocer el estado de la tarea (finalizada y en proceso).
+Consiste en una aplicación en `python` (FastAPI) que recibe instrucciones del **Backend Service** y mediante el **Broker** coordina **Worker**s para realizar las tareas solicitadas. Además, expone otro endpoint para saber si es servicio está activo y otro para conocer el estado de la tarea (finalizada y en proceso).
 
 ### Broker
 
@@ -64,7 +64,10 @@ Se crean para tareas específicas y son de vida corta.
 ## Otros servicios utilizados
 
 ### Bucket Boletas
+Este servicio se utiliza para publicar las boletas creadas al comprar un acción (solo si el usuario lo solicita).
 
 ### Lambda
+Este servicio se encarga de generar las boletas, fue hecho Serverless y utilizando `python`.
 
 ### Cognito
+Este servicio maneja las credenciales de los usuarios y valida los inicios de sesión.
