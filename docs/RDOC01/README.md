@@ -60,3 +60,11 @@ Es creado segun la imagen de Redis, un servicio de Broker para coordinar los **W
 ### Worker
 
 Se crean para tareas específicas y son de vida corta.
+
+## Otros servicios utilizados
+
+### Bucket Boletas
+
+### Lambda
+
+### Cognito
