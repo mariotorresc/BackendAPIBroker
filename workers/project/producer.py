@@ -1,4 +1,4 @@
-import os
+git import os
 
 # FastAPI
 from fastapi import FastAPI
@@ -38,7 +38,7 @@ def get_job(job_id: str):
 
 @app.get("/heartbeat")
 def heartbeat_status():
-    return {"message": "True"}
+    return {"message": "true"}
 
 
 # # https://docs.celeryq.dev/en/stable/getting-started/first-steps-with-celery.html
