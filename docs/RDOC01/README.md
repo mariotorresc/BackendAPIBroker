@@ -1,8 +1,8 @@
-# 2023-2 / IIC2173 - E1 | Fintech Async | Explicación UML
+# 2023-2 / IIC2173 - E2 | Fintech Async | Explicación UML
 
 El diagrama resultante es:
 
-![](./E1-UML-diagrama.drawio.png)
+![](./E2-UML-diagrama.drawio.png)
 
 ## Frontend
 
@@ -27,8 +27,8 @@ Finalmente, la respuesta seguirá el mismo flujo de la solicitud, pero en revers
 
 ## Aplicación
 
-La aplicación consiste en cuatro contenedores dockerizados que se comunican entre ellos mediante un volumen compartido.
-Estos contenedores son: **Backend Service**, **Database**, **MQTT Sender** y **MQTT Receiver**.
+La aplicación consiste en contenedores dockerizados que se comunican entre ellos mediante un volumen compartido y networks.
+Estos contenedores son: **Backend Service**, **Database**, **MQTT Sender**, **MQTT Receiver**, **Job Master**, **Broker** y n **Workers**.
 
 ### Backend Service
 
@@ -38,12 +38,25 @@ Se encarga de procesar las solicitudes que llegan del Frontend. Se comunica con 
 Consiste en la base de datos de la aplicación. Se comunica con los otros 3 contenedores. Tiene la función de almacenar la información de la aplicación.
 ### MQTT Sender
 
-Mediante el protocolo MQTT, se suscribe al tópico `stocks/request` para enviar solicitudes de compra de los usuarios. Solo se activa cuando el **Backend Service** lo solicita, ejecutando una función que publica la solicitud 
+Mediante el protocolo MQTT, se suscribe al tópico `stocks/request` para enviar solicitudes de compra de los usuarios. Solo se activa cuando el **Backend Service** lo solicita, ejecutando una función que publica la solicitud .
 ### MQTT Receiver
 
 Al igual que el anterior, este contenedor también utiliza el protocolo MQTT.
 Con la diferencia, que este contenedor solo se dedica a escuchar los mensajes enviados por el MQTT Broker.
-Se suscribe a los tópicos `stocks/info` y `stocks/validation`.
+Se suscribe a los tópicos `stocks/info`, `stocks/request` y `stocks/validation`.
 
 Del primer tópico recibe la información actualizada del valor de los stocks cada 5 minutos y se ejecuta una función que guarda y actualiza valores en la **Database**.
-Del segundo tópico recibe las validaciones de las solicitudes de compra. Para esta entrega, se hace un filtro y solo se consideran las solicitudes hechas por nuestro grupo 3. Al recibirlas, se ejecuta una función que actualiza el estado de la solicitud a aceptado o rechazado, según sea el caso.
+Del segundo tópico recibe las solicitudes de compra de las aplicaciones del resto de grupos
+Del tercer tópico recibe las validaciones de las solicitudes de compra. Para esta entrega, se hace un filtro y solo se consideran las solicitudes hechas por nuestro grupo 3. Al recibirlas, se ejecuta una función que actualiza el estado de la solicitud a aceptado o rechazado, según sea el caso.
+
+### Job Master
+
+Consiste en una aplicación en python (FastAPI) que recibe instrucciones del **Backend Service** y mediante el **Broker** coordina **Worker**s para realizar las tareas solicitadas. Además, expone otro endpoint para saber si es servicio está activo y otro para conocer el estado de la tarea (finalizada y en proceso).
+
+### Broker
+
+Es creado segun la imagen de Redis, un servicio de Broker para coordinar los **Worker**s con el **Job Master**.
+
+### Worker
+
+Se crean para tareas específicas y son de vida corta.

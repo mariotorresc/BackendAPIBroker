@@ -1,4 +1,4 @@
-# 2023-2 / IIC2173 - E1 | Fintech Async | Webpay integration
+# 2023-2 / IIC2173 - E2 | Fintech Async | Webpay integration
 
 ## Frontend
 
