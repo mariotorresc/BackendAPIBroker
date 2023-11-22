@@ -53,6 +53,16 @@ mqttClient.on('message', (topic, message) => {
       // Propuesta
       // TO DO: guardar oferta en database, si se acepta/rechaza/se aceptó otra/aun no se acepta: indicar de alguna forma
     }
+    else if (auctionData.type === 'acceptance') {
+      // Respuesta a Propuesta
+      // Una propuesta fue aceptada
+      // Buscar propuesta, marcarla como aceptada
+    }
+    else if (auctionData.type === 'rejection') {
+      // Respuesta a Propuesta
+      // Una propuesta fue rechazada
+      // Buscar propuesta, marcarla como rechazada
+    }
   }
 });
 
