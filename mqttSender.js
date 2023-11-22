@@ -16,6 +16,7 @@ mqttClientSender.on('connect', () => {
   console.log('Connected to MQTT SENDER broker');
   mqttClientSender.subscribe('stocks/requests');
   mqttClientSender.subscribe('stocks/validation');
+  mqttClientSender.subscribe('stocks/auctions');
 });
 
 mqttClientSender.on('error', (error) => {
@@ -46,7 +47,18 @@ function PublishValidation(stockRequest) {
   });
 }
 
+function PublishNewAuction(auctionData) {
+  mqttClientSender.publish('stocks/auctions', JSON.stringify(auctionData), (error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(`'${auctionData.type}' enviada con éxito:\n${auctionData}`);
+    }
+  });
+}
+
 module.exports = {
   PublishNewRequest,
-  PublishValidation
+  PublishValidation,
+  PublishNewAuction
 };
