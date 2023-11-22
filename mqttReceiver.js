@@ -19,6 +19,7 @@ mqttClient.on('connect', () => {
   mqttClient.subscribe('stocks/info');
   mqttClient.subscribe('stocks/requests');
   mqttClient.subscribe('stocks/validation');
+  mqttClient.subscribe('stocks/auctions');
 });
 
 mqttClient.on('message', (topic, message) => {
@@ -39,6 +40,19 @@ mqttClient.on('message', (topic, message) => {
     // actualizar la base de datos
     ValidateRequest(validationInfo);
     console.log(`Compra válida:\n${message}`);
+  }
+  else if (topic === 'stocks/auctions') {
+    const auctionData = JSON.parse(message.toString());
+    // RECIBIR: Subastas y Propuestas de otros grupos
+    console.log(`Se recibe una subasta:\n${message}`);
+    if (auctionData.type === 'offer') {
+      // Subasta
+      // TO DO: Guardar subasta en database 
+    }
+    else if (auctionData.type === 'proposal') {
+      // Propuesta
+      // TO DO: guardar oferta en database, si se acepta/rechaza/se aceptó otra/aun no se acepta: indicar de alguna forma
+    }
   }
 });
 
