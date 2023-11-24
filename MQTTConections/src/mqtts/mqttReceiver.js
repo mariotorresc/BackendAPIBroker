@@ -30,11 +30,17 @@ mqttClient.on("message", (topic, message) => {
     // llenar la base de datos
     SaveStocks(stockInfo);
   } else if (topic === "stocks/requests") {
-    const requestInfo = JSON.parse(message.toString());
-    if (requestInfo.group_id !== GROUP_NUMBER) {
+    console.log(`Compra recibida:\n${message}`);
+    let requestInfo = null;
+    try {
+      requestInfo = JSON.parse(message?.toString());
+    } catch (e) {
+      console.error("Error parsing requestInfo:", e);
+    }
+    if (requestInfo?.group_id !== GROUP_NUMBER && requestInfo) {
       SaveExternalRequests(requestInfo);
       console.log(
-        `External Request (Grupo ${requestInfo.group_id})\n${message}`
+        `External Request (Grupo ${requestInfo?.group_id})\n${message}`
       );
     }
   } else if (topic === "stocks/validation") {

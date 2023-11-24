@@ -1,26 +1,27 @@
-require('dotenv').config();
+require("dotenv").config();
 
 const config = {
   default: {
-    database: 'brokerdb',
-    dialect: 'postgres',
-    host: 'db',
-    password: 'mypassword',
-    username: 'myuser',
+    database: "brokerdb",
+    dialect: "postgres",
+    host: "db",
+    password: "mypassword",
+    username: "myuser",
   },
   development: {
-    extend: 'default',
+    extend: "default",
   },
   production: {
-    extend: 'default',
+    extend: "default",
   },
   test: {
-    extend: 'default',
+    extend: "default",
   },
 };
 
 Object.keys(config).forEach((configKey) => {
-  //
+  console.log(configKey);
+
   const configValue = config[configKey];
   if (configValue.extend) {
     config[configKey] = { ...config[configValue.extend], ...configValue };

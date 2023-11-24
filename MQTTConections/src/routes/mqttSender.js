@@ -8,34 +8,24 @@ const {
 const router = new KoaRouter();
 
 router.get("/", async (ctx) => {
+  console.log("MQTT Sender");
   ctx.status = 200;
   ctx.body = "MQTT Sender";
 });
 
 router.post("/newRequest", async (ctx) => {
+  console.log("newRequest");
   const { stockRequest } = ctx.request.body;
-  await PublishNewRequest(stockRequest)
-    .then(() => {
-      ctx.status = 200;
-      ctx.body = "Request sent";
-    })
-    .catch((err) => {
-      ctx.status = 400;
-      ctx.body = err.message;
-    });
+  await PublishNewRequest(stockRequest);
+  ctx.status = 200;
+  ctx.body = "Request sent";
 });
 
 router.post("/validation", async (ctx) => {
   const { stockRequest } = ctx.request.body;
-  await PublishValidation(stockRequest)
-    .then(() => {
-      ctx.status = 200;
-      ctx.body = "Validation sent";
-    })
-    .catch((err) => {
-      ctx.status = 400;
-      ctx.body = err.message;
-    });
+  await PublishValidation(stockRequest);
+  ctx.status = 200;
+  ctx.body = "Validation sent";
 });
 
 module.exports = router;

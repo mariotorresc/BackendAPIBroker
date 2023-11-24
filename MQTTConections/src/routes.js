@@ -5,6 +5,6 @@ const sender = require("./routes/mqttSender");
 
 const router = new KoaRouter();
 
-router.use("/", sender.routes());
+router.use("/sender", sender.routes());
 
 module.exports = router;

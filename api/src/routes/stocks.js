@@ -2,9 +2,8 @@
 /* eslint-disable radix */
 const KoaRouter = require('koa-router');
 const { v4: uuidv4 } = require('uuid');
-const { Op } = require('sequelize');
-const { PublishNewRequest, PublishValidation } = require('../../mqttSender');
 const tx = require('../utils/trx');
+const { PublishNewRequest, PublishValidation } = require('../requests/mqttRequests');
 const { SaveRequests } = require('../helpers/requests');
 require('dotenv').config();
 
@@ -72,132 +71,9 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
   }
 });
 
-// router.get('get-all-purchases-seven-days', '/:symbol/purchases', async (ctx) => {
-//   const { symbol } = ctx.params;
-//   try {
-//     const stock = await ctx.orm.stock.findOne({
-//       attributes: ['symbol', 'id'],
-//       where: { symbol },
-//     });
-
-//     if (!stock) {
-//       ctx.status = 404;
-//       ctx.body = { message: 'Stock not found' };
-//       return;
-//     }
-
-//     // Falta acortarlo a siete dias (Camilo)
-//     const purchases = await ctx.orm.request.findAndCountAll({
-//       where: {
-//         state: true,
-//         stockId: stock.id,
-//         createdAt: {
-//           [Op.lt]: new Date(),
-//           [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000 * 7)
-//         }
-//       },
-//     });
-
-//     ctx.status = 200;
-//     ctx.body = purchases;
-//   } catch (err) {
-//     ctx.body = err.message;
-//     ctx.status = 400;
-//   }
-// });
-
-router.get('/get-simulation', '/prediction/get', async (ctx) => {
-  // const { symbol } = ctx.params;
-  const { quantity, symbol, time } = ctx.query;
-  try {
-    mensaje = { message: 'bien' };
-    console.log(`bien. El mensaje es ${symbol} ${time} ${quantity}`);
-    ctx.status = 200;
-    ctx.body = mensaje;
-
-    // ir a buscar el N
-    const stock = await ctx.orm.stock.findOne({
-      attributes: ['symbol', 'id'],
-      where: { symbol },
-    });
-
-    if (!stock) {
-      ctx.status = 404;
-      ctx.body = { message: 'Stock not found' };
-      return;
-    }
-    const purchases = await ctx.orm.request.findAndCountAll({
-      where: {
-        createdAt: {
-          [Op.lt]: new Date(),
-          [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000 * 7)
-        },
-        state: true,
-        stockId: stock.id
-      },
-    });
-
-    console.log(`Las purchases son ${purchases}`);
-
-    // ir a buscar el historial de precios de la stock desde
-    // el tiempo atrás que el usuario indica
-    const days = time || 7;
-    let finish = false;
-    let stockHistories = [];
-    let offset = 0;
-    const limit = 100;
-
-    while (!finish) {
-      const rows = await ctx.orm.stocksHistories.findAll({
-        attributes: {
-          exclude: ['id', 'currency', 'source', 'stockId', 'updatedAt', 'deletedAt']
-        },
-        limit,
-        offset: limit * offset,
-        where: {
-          createdAt: {
-            [Op.lt]: new Date(),
-            [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000 * days),
-          },
-          stockId: stock.id
-        },
-      });
-      stockHistories = stockHistories.concat(rows);
-      console.log(`\nNumero ${offset + 1} de iteración (${rows.length} rows)\n`);
-      offset++;
-      if (rows.length < limit) {
-        finish = true;
-      }
-    }
-
-    pricesAndDates = {};
-    pricesAndDates.rows = stockHistories;
-    pricesAndDates.length = stockHistories.length;
-
-    console.log('Price and dates:', pricesAndDates);
-
-    details = {
-      N: purchases.count,
-      actual_date: new Date(),
-      pricesAndDates,
-      quantity,
-      symbol,
-      time
-    };
-
-    // enviar details a los workers
-    // post
-  } catch (err) {
-    ctx.body = err.message;
-    ctx.status = 400;
-  }
-});
-
 // receive a purchase from the endpoint /stocks/purchase
 router.post('/post-stock-purchase', '/purchase', async (ctx) => {
-  const {
-    symbol, quantity, groupId, email, priceToPay
-  } = ctx.request.body;
+  const { symbol, quantity, groupId, email, priceToPay } = ctx.request.body;
   try {
     const stock = await ctx.orm.stock.findOne({
       where: { symbol },
@@ -233,13 +109,23 @@ router.post('/post-stock-purchase', '/purchase', async (ctx) => {
       priceToPay,
       process.env?.REDIRECT_URL || 'http://localhost:3001/purchaseCompleted'
     );
+    console.log('----------------  1   ----------------');
+    console.log('trx', trx);
+    console.log('request', request);
+    console.log('stockRequest', stockRequest);
 
     // Update DB request with deposit token
-    await request.update({ depositToken: trx.token });
+    await request.update({ depositToken: trx.token }).catch((err) => {
+      console.log('Error al actualizar la request', err);
+    });
+    console.log('----------------  2   ----------------');
+
     stockRequest.deposit_token = trx.token;
 
     // Send a message to the channel stocks/request
     PublishNewRequest(stockRequest);
+    console.log('----------------  3   ----------------');
+
     ctx.status = 200;
     ctx.body = trx;
   } catch (err) {
