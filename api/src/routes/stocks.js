@@ -104,14 +104,14 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
 //     ctx.body = err.message;
 //     ctx.status = 400;
 //   }
-// }); 
+// });
 
 router.get('/get-simulation', '/prediction/get', async (ctx) => {
   // const { symbol } = ctx.params;
   const { quantity, symbol, time } = ctx.query;
   try {
-    mensaje = {"message": "bien"}
-    console.log(`bien. El mensaje es ${symbol} ${time} ${quantity}`)
+    mensaje = { message: 'bien' };
+    console.log(`bien. El mensaje es ${symbol} ${time} ${quantity}`);
     ctx.status = 200;
     ctx.body = mensaje;
 
@@ -130,16 +130,16 @@ router.get('/get-simulation', '/prediction/get', async (ctx) => {
       where: {
         createdAt: {
           [Op.lt]: new Date(),
-          [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000 * 7),
+          [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000 * 7)
         },
         state: true,
-        stockId: stock.id,
+        stockId: stock.id
       },
     });
 
     console.log(`Las purchases son ${purchases}`);
 
-    // ir a buscar el historial de precios de la stock desde 
+    // ir a buscar el historial de precios de la stock desde
     // el tiempo atrás que el usuario indica
     const days = time || 7;
     let finish = false;
@@ -152,7 +152,7 @@ router.get('/get-simulation', '/prediction/get', async (ctx) => {
         attributes: {
           exclude: ['id', 'currency', 'source', 'stockId', 'updatedAt', 'deletedAt']
         },
-        limit: limit,
+        limit,
         offset: limit * offset,
         where: {
           createdAt: {
@@ -174,24 +174,19 @@ router.get('/get-simulation', '/prediction/get', async (ctx) => {
     pricesAndDates.rows = stockHistories;
     pricesAndDates.length = stockHistories.length;
 
-    console.log("Price and dates:", pricesAndDates);
-
-
+    console.log('Price and dates:', pricesAndDates);
 
     details = {
-      "quantity": quantity,
-      "symbol": symbol,
-      "time": time,
-      "N": purchases["count"],
-      "actual_date": new Date(),
-      "pricesAndDates": pricesAndDates
-    }
+      N: purchases.count,
+      actual_date: new Date(),
+      pricesAndDates,
+      quantity,
+      symbol,
+      time
+    };
 
     // enviar details a los workers
-    // post 
-    
-
-
+    // post
   } catch (err) {
     ctx.body = err.message;
     ctx.status = 400;
@@ -200,7 +195,9 @@ router.get('/get-simulation', '/prediction/get', async (ctx) => {
 
 // receive a purchase from the endpoint /stocks/purchase
 router.post('/post-stock-purchase', '/purchase', async (ctx) => {
-  const { symbol, quantity, groupId, email, priceToPay } = ctx.request.body;
+  const {
+    symbol, quantity, groupId, email, priceToPay
+  } = ctx.request.body;
   try {
     const stock = await ctx.orm.stock.findOne({
       where: { symbol },

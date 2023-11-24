@@ -1,5 +1,9 @@
 node_modules
+./api/node_modules
+./MQTTConections/node_modules
 .env
+./api/.env
+./MQTTConections/.env
 ./SSHAPIMariosBrokerPassword.pem
 SSHAPIMariosBrokerPassword.pem
 /workers/.env
