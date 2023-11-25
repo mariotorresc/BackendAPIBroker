@@ -1,0 +1,65 @@
+services:
+
+  nginx:
+    build: ./workers/nginx
+    ports: 
+      - 80:80 # Configure HTTP port
+    depends_on:
+      - producer
+      # - dashboard
+      # - load-test-master
+
+  redis-broker:
+    # https://redis.com/solutions/use-cases/messaging/
+    image: redis:7
+    volumes:
+      - ./workers/redis/redis.conf:/usr/local/etc/workers/redis/redis.conf
+
+  producer:
+    build:
+        context: ./workers/project
+        dockerfile: Dockerfile
+    command: uvicorn producer:app --reload --host 0.0.0.0 --port 8000
+    volumes:
+      - ./workers/project:/opt/
+    expose:
+      - 8000
+    environment:
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+    depends_on:
+      - redis-broker
+
+  consumer:
+    build:
+      context: ./workers/project
+      dockerfile: Dockerfile
+    deploy:
+      # replicas scales containers
+      replicas: 1
+    # concurrency specifies number of worker
+    # purge deletes the broker queue every time it starts up
+    command: celery -A consumer.celery_app worker --loglevel=INFO --purge --concurrency=1
+    volumes:
+      - ./workers/project:/opt/
+    depends_on:
+      - producer
+    environment:
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+
+  # celery_beat:
+  #   build:
+  #     context: ./project
+  #     dockerfile: Dockerfile
+  #   command: celery -A consumer.celery_app beat --loglevel=INFO
+  #   volumes:
+  #     - ./project:/opt/
+  #   depends_on:
+  #     - producer
+  #   environment:
+  #     CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+  #     CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+
+volumes:
+  postgres_data:

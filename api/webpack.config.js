@@ -5,36 +5,26 @@ const ManifestPlugin = require('webpack-manifest-plugin');
 const developmentMode = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
 module.exports = {
-  mode: developmentMode ? 'development' : 'production',
   context: path.join(__dirname, 'src', 'assets'),
+  devtool: developmentMode ? 'eval' : 'source-map',
   entry: {
     app: ['./js/index.js', './js/app.jsx'],
   },
-  output: {
-    publicPath: '/assets/',
-    path: path.join(__dirname, 'build', 'assets'),
-    filename: developmentMode
-      ? '[name].js'
-      : '[name]-[hash].js',
-  },
-  resolve: {
-    extensions: ['.js', '.jsx', '.json', '.css', '.scss'],
-  },
-  devtool: developmentMode ? 'eval' : 'source-map',
+  mode: developmentMode ? 'development' : 'production',
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
+        test: /\.jsx?$/,
       },
       {
-        test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)(\?v=.+)?$/i,
         loader: 'file-loader',
         options: {
-          name: developmentMode ? '[name].[ext]' : '[name]-[hash].[ext]',
           esModule: false,
+          name: developmentMode ? '[name].[ext]' : '[name]-[hash].[ext]',
         },
+        test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)(\?v=.+)?$/i,
       },
       {
         test: /\.s?css$/,
@@ -46,11 +36,21 @@ module.exports = {
       },
     ],
   },
+  output: {
+    filename: developmentMode
+      ? '[name].js'
+      : '[name]-[hash].js',
+    path: path.join(__dirname, 'build', 'assets'),
+    publicPath: '/assets/',
+  },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: '[name]-[hash].css',
       chunkFilename: '[id]-[hash].css',
+      filename: '[name]-[hash].css',
     }),
     new ManifestPlugin(),
   ],
+  resolve: {
+    extensions: ['.js', '.jsx', '.json', '.css', '.scss'],
+  },
 };

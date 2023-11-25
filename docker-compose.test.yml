@@ -2,18 +2,13 @@ version: "3"
 services:
   db:
     image: postgres:latest
-    networks:
-      - app-network
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-      DB_PORT: ${DB_PORT}
 
   migrations:
     build: ./api/
-    networks:
-      - app-network
     environment:
       DB_DIALECT: ${DB_DIALECT}
       DB_PORT: ${DB_PORT}
@@ -24,29 +19,6 @@ services:
     depends_on:
       - db
     command: ["yarn", "migrate-and-seed"] # Run migrations using the "migrate" script
-
-  app:
-    build: ./api/
-    ports:
-      - "3000:3000"
-    container_name: api1
-    networks:
-      - app-network
-    environment:
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-      DB_HOST: ${DB_HOST}
-      MQTT_HOST: ${MQTT_HOST}
-      MQTT_PORT: ${MQTT_PORT}
-      MQTT_USER: ${MQTT_USER}
-      MQTT_PASSWORD: ${MQTT_PASSWORD}
-      REDIRECT_URL: ${REDIRECT_URL}
-    depends_on:
-      - migrations
-    command: ["yarn", "start"]
-    volumes:
-      - app-data:/app/data
 
   mqttsender:
     build: ./MQTTConections/
@@ -65,7 +37,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - migrations
+      - db
     command: ["yarn", "start"]
     volumes:
       - app-data:/app/data
@@ -81,10 +53,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       DB_HOST: ${DB_HOST}
-    networks:
-      - app-network
     depends_on:
-      - migrations
+      - db
     command: ["node", "./src/mqtts/mqttReceiver.js"]
     volumes:
       - app-data:/app/data
@@ -92,5 +62,6 @@ services:
 networks:
   app-network:
     driver: bridge
+    
 volumes:
   app-data:
