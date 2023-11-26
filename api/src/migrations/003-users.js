@@ -11,6 +11,11 @@ module.exports = {
         allowNull: true,
         type: Sequelize.DATE,
       },
+      admin: {
+        allowNull: false,
+        defaultValue: false,
+        type: Sequelize.BOOLEAN,
+      },
       email: {
         allowNull: false,
         type: Sequelize.STRING(70),

@@ -5,6 +5,11 @@ module.exports = (sequelize, DataTypes) => {
   class user extends Model {}
   user.init(
     {
+      admin: {
+        allowNull: false,
+        defaultValue: false,
+        type: DataTypes.BOOLEAN,
+      },
       email: {
         allowNull: false,
         type: DataTypes.STRING,
