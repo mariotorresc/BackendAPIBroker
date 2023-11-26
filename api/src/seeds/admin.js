@@ -9,7 +9,7 @@ module.exports = {
       email: 'sasanmartinadmin@uc.cl',
       lastName: 'San Martín',
       name: 'Sebastían',
-      password: 'ANotSoSecurePassword',
+      password: 'hola1234',
       admin: true,
       updatedAt: new Date(),
     });
