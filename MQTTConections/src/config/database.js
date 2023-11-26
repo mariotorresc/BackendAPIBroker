@@ -20,8 +20,6 @@ const config = {
 };
 
 Object.keys(config).forEach((configKey) => {
-  console.log(configKey);
-
   const configValue = config[configKey];
   if (configValue.extend) {
     config[configKey] = { ...config[configValue.extend], ...configValue };
