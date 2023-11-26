@@ -2,9 +2,8 @@
 /* eslint-disable radix */
 const KoaRouter = require('koa-router');
 const { v4: uuidv4 } = require('uuid');
-const { Op } = require('sequelize');
-const { PublishNewRequest, PublishValidation } = require('../../mqttSender');
 const tx = require('../utils/trx');
+const { PublishNewRequest, PublishValidation } = require('../requests/mqttRequests');
 const { SaveRequests } = require('../helpers/requests');
 require('dotenv').config();
 
@@ -72,39 +71,6 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
   }
 });
 
-router.get('get-all-purchases-seven-days', '/:symbol/purchases', async (ctx) => {
-  const { symbol } = ctx.params;
-  try {
-    const stock = await ctx.orm.stock.findOne({
-      attributes: ['symbol', 'id'],
-      where: { symbol },
-    });
-
-    if (!stock) {
-      ctx.status = 404;
-      ctx.body = { message: 'Stock not found' };
-      return;
-    }
-
-    const purchases = await ctx.orm.request.findAndCountAll({
-      where: {
-        createdAt: {
-          [Op.lt]: new Date(),
-          [Op.gt]: new Date(new Date() - 24 * 60 * 60 * 1000 * 7),
-        },
-        state: true,
-        stockId: stock.id,
-      },
-    });
-
-    ctx.status = 200;
-    ctx.body = purchases;
-  } catch (err) {
-    ctx.body = err.message;
-    ctx.status = 400;
-  }
-});
-
 // receive a purchase from the endpoint /stocks/purchase
 router.post('/post-stock-purchase', '/purchase', async (ctx) => {
   const { symbol, quantity, groupId, email, priceToPay } = ctx.request.body;
@@ -143,13 +109,16 @@ router.post('/post-stock-purchase', '/purchase', async (ctx) => {
       priceToPay,
       process.env?.REDIRECT_URL || 'http://localhost:3001/purchaseCompleted'
     );
-
     // Update DB request with deposit token
-    await request.update({ depositToken: trx.token });
+    await request.update({ depositToken: trx.token }).catch((err) => {
+      console.log('Error al actualizar la request', err);
+    });
+
     stockRequest.deposit_token = trx.token;
 
     // Send a message to the channel stocks/request
     PublishNewRequest(stockRequest);
+
     ctx.status = 200;
     ctx.body = trx;
   } catch (err) {
