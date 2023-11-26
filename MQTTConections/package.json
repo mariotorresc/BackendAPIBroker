@@ -41,6 +41,7 @@
     "koa-static": "^5.0.0",
     "mqtt": "^5.0.3",
     "mysql2": "^2.2.5",
+    "newrelic": "latest",
     "pg": "^8.11.3",
     "sequelize": "^6.3.5",
     "sequelize-cli": "^6.2.0",
