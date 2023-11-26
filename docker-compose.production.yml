@@ -49,7 +49,7 @@ services:
     command: ["yarn", "migrate-and-seed"] # Run migrations using the "migrate" script
 
   mqttsender:
-    build: public.ecr.aws/b1r2y5q5/mqtt-conections:latest
+    image: public.ecr.aws/b1r2y5q5/mqtt-conections:latest
     ports:
       - "3010:3010"
     environment:
@@ -71,7 +71,7 @@ services:
       - app-data:/app/data
 
   mqttreceiver:
-    build: public.ecr.aws/b1r2y5q5/mqtt-conections:latest
+    image: public.ecr.aws/b1r2y5q5/mqtt-conections:latest
     environment:
       MQTT_HOST: ${MQTT_HOST}
       MQTT_PORT: ${MQTT_PORT}
