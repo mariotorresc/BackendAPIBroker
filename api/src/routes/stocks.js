@@ -109,22 +109,15 @@ router.post('/post-stock-purchase', '/purchase', async (ctx) => {
       priceToPay,
       process.env?.REDIRECT_URL || 'http://localhost:3001/purchaseCompleted'
     );
-    console.log('----------------  1   ----------------');
-    console.log('trx', trx);
-    console.log('request', request);
-    console.log('stockRequest', stockRequest);
-
     // Update DB request with deposit token
     await request.update({ depositToken: trx.token }).catch((err) => {
       console.log('Error al actualizar la request', err);
     });
-    console.log('----------------  2   ----------------');
 
     stockRequest.deposit_token = trx.token;
 
     // Send a message to the channel stocks/request
     PublishNewRequest(stockRequest);
-    console.log('----------------  3   ----------------');
 
     ctx.status = 200;
     ctx.body = trx;
