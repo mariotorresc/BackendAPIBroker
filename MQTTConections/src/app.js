@@ -1,3 +1,4 @@
+require('newrelic');
 const path = require("path");
 require("dotenv").config();
 const Koa = require("koa");
