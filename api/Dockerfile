@@ -7,6 +7,7 @@ WORKDIR /app
 # Copy package.json and yarn.lock
 COPY package.json ./
 # COPY yarn.lock ./
+ENV NEW_RELIC_NO_CONFIG_FILE=true
 
 # Install dependencies
 RUN yarn install

@@ -42,6 +42,7 @@ services:
       MQTT_USER: ${MQTT_USER}
       MQTT_PASSWORD: ${MQTT_PASSWORD}
       REDIRECT_URL: ${REDIRECT_URL}
+      NEW_RELIC_NO_CONFIG_FILE: true
     depends_on:
       - migrations
     command: ["yarn", "start"]
@@ -61,6 +62,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       DB_HOST: ${DB_HOST}
+      NEW_RELIC_NO_CONFIG_FILE: true
     container_name: mqttsender
     networks:
       - app-network
@@ -81,6 +83,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       DB_HOST: ${DB_HOST}
+      NEW_RELIC_NO_CONFIG_FILE: true
     networks:
       - app-network
     depends_on:
