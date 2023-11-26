@@ -3,7 +3,7 @@ name: Build and Push to ECR
 on:
   push:
     branches:
-      - main
+      - [main, DockerFixBranch]
 permissions:
   id-token: write
   contents: read
@@ -25,17 +25,27 @@ jobs:
         id: login-ecr-public
         uses: aws-actions/amazon-ecr-login@v1
         with:
-          mask-password: 'true'
+          mask-password: "true"
           registry-type: public
 
-      - name: Build, tag, and push image to Amazon ECR Public
+      - name: Build, tag, and push image of api to Amazon ECR Public
         env:
           REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
           REGISTRY_ALIAS: b1r2y5q5
           REPOSITORY: backendapibroker
           IMAGE_TAG: latest
         run: |
-          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
+          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG ./api
+          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
+
+      - name: Build, tag, and push image of mqtt to Amazon ECR Public
+        env:
+          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+          REGISTRY_ALIAS: b1r2y5q5
+          REPOSITORY: mqtt-conections
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG ./MQTTConections
           docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
 
   deploy-to-ec2:
@@ -55,7 +65,8 @@ jobs:
         run: zip -r deploy.zip scripts/ appspec.yml docker-compose.production.yml
 
       - name: Upload the zip to S3
-        run: zip -r deploy.zip scripts/ appspec.yml docker-compose.production.yml |
+        run:
+          zip -r deploy.zip scripts/ appspec.yml docker-compose.production.yml |
           aws s3 cp deploy.zip s3://codedeploy-bucket-backendapibroker
 
       - name: Set up Docker Compose environment

@@ -1,9 +1,12 @@
-version: '3'
+version: "3"
 services:
   app:
     image: public.ecr.aws/b1r2y5q5/backendapibroker:latest
     ports:
-      - '3000:3000'
+      - "3000:3000"
+    container_name: api1
+    networks:
+      - app-network
     environment:
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
@@ -15,20 +18,25 @@ services:
       MQTT_PASSWORD: ${MQTT_PASSWORD}
       REDIRECT_URL: ${REDIRECT_URL}
     depends_on:
-      - db
-    command: ['yarn', 'start']
+      - migrations
+    command: ["yarn", "start"]
     volumes:
       - app-data:/app/data
 
   db:
     image: postgres:latest
+    networks:
+      - app-network
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
 
   migrations:
     image: public.ecr.aws/b1r2y5q5/backendapibroker:latest
+    networks:
+      - app-network
     environment:
       DB_DIALECT: postgres
       DB_PORT: ${DB_PORT}
@@ -38,33 +46,51 @@ services:
       DB_HOST: ${DB_HOST}
     depends_on:
       - db
-    command: ['yarn', 'migrate-and-seed'] # Run migrations using the "migrate" script
-
-  mqttreceiver:
-    image: public.ecr.aws/b1r2y5q5/backendapibroker:latest
-    environment:
-      MQTT_HOST: ${MQTT_HOST}
-      MQTT_PORT: ${MQTT_PORT}
-      MQTT_USER: ${MQTT_USER}
-      MQTT_PASSWORD: ${MQTT_PASSWORD}
-    depends_on:
-      - db
-    command: ['node', 'mqttReceiver.js']
-    volumes:
-      - app-data:/app/data
+    command: ["yarn", "migrate-and-seed"] # Run migrations using the "migrate" script
 
   mqttsender:
-    image: public.ecr.aws/b1r2y5q5/backendapibroker:latest
+    build: public.ecr.aws/b1r2y5q5/mqtt-conections:latest
+    ports:
+      - "3010:3010"
     environment:
       MQTT_HOST: ${MQTT_HOST}
       MQTT_PORT: ${MQTT_PORT}
       MQTT_USER: ${MQTT_USER}
       MQTT_PASSWORD: ${MQTT_PASSWORD}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+    container_name: mqttsender
+    networks:
+      - app-network
     depends_on:
-      - db
-    command: ['node', 'mqttSender.js']
+      - migrations
+    command: ["yarn", "start"]
     volumes:
       - app-data:/app/data
 
+  mqttreceiver:
+    build: public.ecr.aws/b1r2y5q5/mqtt-conections:latest
+    environment:
+      MQTT_HOST: ${MQTT_HOST}
+      MQTT_PORT: ${MQTT_PORT}
+      MQTT_USER: ${MQTT_USER}
+      MQTT_PASSWORD: ${MQTT_PASSWORD}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+    networks:
+      - app-network
+    depends_on:
+      - migrations
+    command: ["node", "./src/mqtts/mqttReceiver.js"]
+    volumes:
+      - app-data:/app/data
+
+networks:
+  app-network:
+    driver: bridge
 volumes:
   app-data:
