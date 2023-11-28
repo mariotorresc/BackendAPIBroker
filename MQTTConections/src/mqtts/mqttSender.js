@@ -16,6 +16,7 @@ mqttClientSender.on('connect', () => {
   console.log('Connected to MQTT SENDER broker');
   mqttClientSender.subscribe('stocks/requests');
   mqttClientSender.subscribe('stocks/validation');
+  mqttClientSender.subscribe('stocks/auctions');
 });
 
 mqttClientSender.on('error', (error) => {
@@ -46,7 +47,22 @@ function PublishValidation(stockRequest) {
   });
 }
 
+function PublishNewAuction(auctionData) {
+  mqttClientSender.publish('stocks/auctions', JSON.stringify(auctionData), (error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      // Si es una de tipo offer     , crear en DB la subasta
+      // Si es una de tipo proposal  , crear en DB la propuesta
+      // Si es una de tipo acceptance, restar de las acciones disponibles las acciones subastadas y marcar como aceptada la oferta de otro grupo (Eliminar todas las propuestas de otros grupos en esta subasta)
+      // Si es una de tipo rejection , marcar propuesta como rechazada
+      console.log(`'${auctionData.type}' enviada con éxito:\n${auctionData}`);
+    }
+  });
+}
+
 module.exports = {
   PublishNewRequest,
-  PublishValidation
+  PublishValidation,
+  PublishNewAuction
 };
