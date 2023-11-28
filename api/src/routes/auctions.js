@@ -2,8 +2,14 @@
 /* eslint-disable radix */
 const KoaRouter = require('koa-router');
 const { v4: uuidv4 } = require('uuid');
+const { Op } = require("sequelize");
 const tx = require('../utils/trx');
-const { PublishOffer, PublishProposal } = require('../requests/mqttRequests');
+const {
+  PublishOffer,
+  PublishProposal,
+  HandleAcceptance,
+  HandleRejection
+} = require('../requests/mqttRequests');
 require('dotenv').config();
 
 const GROUP_NUMBER = 3;
@@ -12,7 +18,11 @@ const router = new KoaRouter();
 router.get('get-offers', '/offers', async (ctx) => {
   try {
     const { count, rows } = await ctx.orm.Auction.findAndCountAll({
-      where: { group_id: GROUP_NUMBER },
+      where: {
+        group_id: {
+          [Op.ne]: GROUP_NUMBER,
+        }
+      },
     });
     ctx.body = {
       offers: rows,
@@ -119,15 +129,21 @@ router.post('new-proposal', '/proposals/new', async (ctx) => {
 
 router.post('response-to-proposal', '/proposals/response', async (ctx) => {
   try {
-    // Propuestas hechas por admin nuestro
+    // Este endpoint maneja las respuestas de nuestro admin
     // response es 'acceptance' o 'rejection'
     const { auction_id, proposal_id, response } = ctx.request.body;
+
+    // FindOne Proposal con proposal_id y Auction con auction_id
 
     if (response === 'acceptance') {
       // Restar Stocks de la oferta
       // Sumar  Stocks de la propuesta
       // Colocar en proposal_id de Auction el proposal_id de Proposal -> Offer completada
       // Marcar el status de la propuesta a acceptance
+      HandleAcceptance(algo);
+    } else if (response === 'rejection') {
+      // Marcar el status de la propuesta a rejection
+      HandleRejection(algo);
     }
     const newAuction = await ctx.orm.Proposal.create({
       auction_id: auction_id,
@@ -138,7 +154,6 @@ router.post('response-to-proposal', '/proposals/response', async (ctx) => {
       stock_id: stock_id,
     });
 
-    PublishProposal(newAuction);
 
     ctx.body = {
       offer: newAuction,
@@ -156,6 +171,10 @@ router.post('new-proposal-mqtt', '/proposals/new/mqtt', async (ctx) => {
     // Si la offer que recibe esta nueva propuesta es nuestra offer -> Guardarla
     // Si la offer que recibe esta nueva propuesta NO es nuestra offer -> no Guardarla
     const auctionData = ctx.request.body;
+
+    // FindOne Auction por auctionData.auction_id
+    // If group_id === Otro grupo no que somos nosotros, do nothing
+    // Else, guardar en DB
 
     const newAuction = await ctx.orm.Proposal.create({
       auction_id: auctionData.auction_id,
