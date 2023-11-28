@@ -87,9 +87,20 @@ router.post('new-offer-mqtt', '/offers/new/mqtt', async (ctx) => {
 
 router.get('get-proposals', '/proposals', async (ctx) => {
   try {
-    // TO DO: Varios filtros
+    const offers = await ctx.orm.Auction.findAll({
+      where: { group_id: GROUP_NUMBER, proposal_id: '' },
+    });
+
+    const offer_ids = offers.map((offer) => offer.auction_id);
+    
     // Obtener offers que sean nuestras, por cada una revisar si tienen alguna proposal
-    const { count, rows } = await ctx.orm.Proposal.findAndCountAll();
+    const { count, rows } = await ctx.orm.Proposal.findAndCountAll({
+      where: {
+        auction_id: {
+          [Op.or]: offer_ids,
+        }
+      },
+    });
     ctx.body = {
       proposals: rows,
       totalItems: count,
