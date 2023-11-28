@@ -5,6 +5,11 @@ const {
   ValidateRequest,
   SaveExternalRequests,
 } = require("../helpers/requests");
+const { SaveAuction,
+  SaveProposal,
+  HandleAcceptance,
+  HandleRejection
+} = require("../helpers/auctions");
 
 const GROUP_NUMBER = 3;
 
@@ -52,15 +57,18 @@ mqttClient.on("message", (topic, message) => {
   } else if (topic === 'stocks/auctions') {
     const auctionData = JSON.parse(message.toString());
     // RECIBIR: Subastas y Propuestas de otros grupos
-    console.log(`Se recibe una subasta:\n${message}`);
+    console.log(`Se recibe un intercambio de tipo ${auctionData.type}:\n${message}`);
     if (auctionData.type === 'offer') {
       // Subasta
-      // TO DO: Guardar subasta en database 
-      // Son de otros grupos, admin puede hacerles proposal
+      if (auctionData?.group_id !== GROUP_NUMBER) {
+        SaveAuction(auctionData);
+      }
     }
     else if (auctionData.type === 'proposal') {
       // Propuesta
-      // TO DO: guardar propuesta en database, si se acepta/rechaza/se aceptó otra/aun no se acepta: indicar de alguna forma
+      // Todas las propuestas comienzan con status: 'pending'
+      // TO DO: Revisar si es una propuesta a nosotros
+      SaveProposal(auctionData);
     }
     else if (auctionData.type === 'acceptance') {
       // Respuesta a Propuesta
@@ -68,11 +76,13 @@ mqttClient.on("message", (topic, message) => {
       // Buscar propuesta, marcarla como aceptada
       // Si aceptan una propuesta de nuestro grupo. Eliminar propuesta, sumar acciones a las acciones disponibles para comprar en nuestra app
       // Si es de otro grupo, buscar si nuestro grupo hizo una propuesta. Si esa propuesta existe, marcarla como rechazada
+      HandleAcceptance(auctionData);
     }
     else if (auctionData.type === 'rejection') {
       // Respuesta a Propuesta
       // Una propuesta fue rechazada
       // Buscar propuesta, marcarla como rechazada
+      HandleRejection(auctionData);
     }
   }
 });
