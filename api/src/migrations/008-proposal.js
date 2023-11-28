@@ -15,6 +15,9 @@ module.exports = {
       proposal_id: {
         type: Sequelize.STRING
       },
+      stock_id: {
+        type: Sequelize.STRING
+      },
       quantity: {
         type: Sequelize.INTEGER
       },

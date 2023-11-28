@@ -15,7 +15,7 @@ module.exports = {
       proposal_id: {
         type: Sequelize.STRING
       },
-      stoch_id: {
+      stock_id: {
         type: Sequelize.STRING
       },
       quantity: {

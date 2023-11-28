@@ -1,3 +1,4 @@
+import axios from 'axios';
 const { auction } = require("../models");
 
 async function SaveAuction(auctionData) {
@@ -10,6 +11,13 @@ async function SaveAuction(auctionData) {
       stock_id: auctionData.stock_id,
     };
     // TO DO: enviar por axios
+    const config = {
+      method: 'post',
+      url: `http://localhost:3000/auctions/offers/new`,
+      data: newAuction,
+    };
+    await axios(config);
+
   } catch (error) {
     console.log(error);
   }

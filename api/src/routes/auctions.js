@@ -10,7 +10,7 @@ const router = new KoaRouter();
 
 router.get('get-offers', '/offers', async (ctx) => {
   try {
-    const { count, rows } = await ctx.orm.auction.findAndCountAll({
+    const { count, rows } = await ctx.orm.Auction.findAndCountAll({
       where: { group_id: GROUP_NUMBER },
     });
     ctx.body = {
@@ -29,7 +29,7 @@ router.post('new-offer', '/offers/new', async (ctx) => {
     // Subastas hechas por admin nuestro
     const { stock_id, quantity } = ctx.request.body;
 
-    const newAuction = await auction.create({
+    const newAuction = await ctx.orm.Auction.create({
       auction_id: uuidv4(),
       group_id: GROUP_NUMBER,
       proposal_id: '',
@@ -52,7 +52,7 @@ router.post('new-offer-mqtt', '/offers/new/mqtt', async (ctx) => {
     // Subastas hechas por otros grupos
     const auctionData = ctx.request.body;
 
-    const newAuction = await auction.create({
+    const newAuction = await ctx.orm.Auction.create({
       auction_id: auctionData.auction_id,
       group_id: auctionData.group_id,
       proposal_id: '',
