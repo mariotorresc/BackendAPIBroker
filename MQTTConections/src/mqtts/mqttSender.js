@@ -35,7 +35,7 @@ function PublishNewRequest(stockRequest) {
       console.log('Published');
     }
   });
-}
+};
 
 function PublishValidation(stockRequest) {
   mqttClientSender.publish('stocks/validation', JSON.stringify(stockRequest), (error) => {
@@ -45,24 +45,61 @@ function PublishValidation(stockRequest) {
       console.log('validation Published');
     }
   });
-}
+};
 
-function PublishNewAuction(auctionData) {
-  mqttClientSender.publish('stocks/auctions', JSON.stringify(auctionData), (error) => {
+function PublishNewOffer(auctionData) {
+  const data = auctionData;
+  data.type = 'offer';
+  mqttClientSender.publish('stocks/auctions', JSON.stringify(data), (error) => {
     if (error) {
       console.log(error);
     } else {
-      // Si es una de tipo offer     , crear en DB la subasta
-      // Si es una de tipo proposal  , crear en DB la propuesta
-      // Si es una de tipo acceptance, restar de las acciones disponibles las acciones subastadas y marcar como aceptada la oferta de otro grupo (Eliminar todas las propuestas de otros grupos en esta subasta)
-      // Si es una de tipo rejection , marcar propuesta como rechazada
-      console.log(`'${auctionData.type}' enviada con éxito:\n${auctionData}`);
+      console.log(`'${data.type}' enviada con éxito:\n${auctionData}`);
     }
   });
-}
+};
+
+function PublishNewProposal(auctionData) {
+  const data = auctionData;
+  data.type = 'proposal';
+  mqttClientSender.publish('stocks/auctions', JSON.stringify(data), (error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(`'${data.type}' enviada con éxito:\n${auctionData}`);
+    }
+  });
+};
+
+function PublishAcceptance(auctionData) {
+  const data = auctionData;
+  data.type = 'acceptance';
+  mqttClientSender.publish('stocks/auctions', JSON.stringify(data), (error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(`'${data.type}' enviada con éxito:\n${auctionData}`);
+    }
+  });
+};
+
+function PublishRejection(auctionData) {
+  const data = auctionData;
+  data.type = 'rejection';
+  mqttClientSender.publish('stocks/auctions', JSON.stringify(data), (error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(`'${data.type}' enviada con éxito:\n${auctionData}`);
+    }
+  });
+};
 
 module.exports = {
   PublishNewRequest,
   PublishValidation,
-  PublishNewAuction
+  PublishNewOffer,
+  PublishNewProposal,
+  PublishAcceptance,
+  PublishRejection
 };

@@ -1,4 +1,4 @@
-import axios from 'axios';
+const axios = require('axios');
 const { auction } = require("../models");
 
 async function SaveAuction(auctionData) {
@@ -13,7 +13,7 @@ async function SaveAuction(auctionData) {
     // TO DO: enviar por axios
     const config = {
       method: 'post',
-      url: `http://localhost:3000/auctions/offers/new`,
+      url: `http://app:3000/auctions/offers/new/mqtt`,
       data: newAuction,
     };
     await axios(config);
@@ -25,14 +25,20 @@ async function SaveAuction(auctionData) {
 
 async function SaveProposal(auctionData) {
   try {
-    const newAuction = await auction.create({
+    // validate input?
+    const newAuction = {
       auction_id: auctionData.auction_id,
       group_id: auctionData.group_id,
       proposal_id: auctionData.proposal_id,
       quantity: auctionData.quantity,
-      status: 'pending',
       stock_id: auctionData.stock_id,
-    });
+    };
+    const config = {
+      method: 'post',
+      url: `http://app:3000/auctions/proposals/new/mqtt`,
+      data: newAuction,
+    };
+    await axios(config);
   } catch (error) {
     console.log(error);
   }
