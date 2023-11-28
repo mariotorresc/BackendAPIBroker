@@ -31,6 +31,39 @@ router.get('get-all-stocks', '/', async (ctx) => {
   }
 });
 
+// get stocks admin
+
+router.get('get-all-stocks-admin', '/stocksadmin', async (ctx) => {
+  const page = parseInt(ctx.query.page) || 1;
+  const itemsPerPage = parseInt(ctx.query.size) || 25;
+  try {
+    const adminUserStocks = await models.user.findOne({
+      where: {
+        admin: true,
+      },
+      include: [models.stock], // Include the associated stocks
+    });
+    const adminStocks = adminUserStocks.stocks;
+    const { count, rows } = await ctx.orm.stock.findAndCountAll({
+      where: { id: adminStocks.map((stock) => stock.id),
+      },
+      limit: itemsPerPage,
+      offset: (page - 1) * itemsPerPage,
+      order: [['lastUpdate', 'DESC']],
+    });
+    ctx.body = {
+      currentPage: page,
+      stocks: rows,
+      totalItems: count,
+      totalPages: Math.ceil(count / itemsPerPage),
+    };
+    ctx.status = 200;
+  } catch (err) {
+    ctx.body = err.message;
+    ctx.status = 400;
+  }
+});
+
 router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
   const { symbol } = ctx.params;
   const page = parseInt(ctx.query.page) || 1;
@@ -70,6 +103,59 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
     ctx.status = 400;
   }
 });
+
+router.post('/buy-stock/admin', async (ctx) => {
+  try {
+    // Parse data from the request
+    const { userId, stockId, amount } = ctx.request.body;
+
+    // Find the user and stock
+    const user = await models.user.findByPk(userId);
+    const stock = await models.stock.findByPk(stockId);
+
+    // Check if the user and stock exist
+    if (!user || !stock) {
+      ctx.status = 404;
+      ctx.body = { message: 'User or stock not found' };
+      return;
+    }
+
+    // Check if the admin user has sufficient stocks
+    const adminUser = await models.user.findOne({
+      where: {
+        admin: true,
+      },
+      include: [models.stock], // Include the associated stocks
+    });
+
+    const adminStock = adminUser.stocks.find((adminStock) => adminStock.id === stock.id);
+
+    if (!adminStock || adminStock.amount < amount) {
+      ctx.status = 400;
+      ctx.body = { message: 'Insufficient stocks available for purchase' };
+      return;
+    }
+
+    // Create a new userStock entry for the user
+    const userStock = await models.userStock.create({
+      userId,
+      stockId,
+      amount,
+    });
+
+    // Update the admin's stock amount
+    adminStock.amount -= amount;
+    await adminStock.save();
+
+    ctx.status = 200;
+    ctx.body = { message: 'Stock purchased successfully', userStock };
+  } catch (error) {
+    console.error(error);
+    ctx.status = 500;
+    ctx.body = { message: 'Internal Server Error' };
+  }
+});
+
 
 // receive a purchase from the endpoint /stocks/purchase
 router.post('/post-stock-purchase', '/purchase', async (ctx) => {
