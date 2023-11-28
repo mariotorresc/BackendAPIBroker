@@ -48,7 +48,7 @@ router.post('new-offer', '/offers/new', async (ctx) => {
       stock_id: stock_id,
     });
 
-    PublishOffer(newAuction);
+    await PublishOffer(newAuction);
 
     ctx.body = {
       offer: newAuction,

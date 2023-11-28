@@ -48,49 +48,81 @@ function PublishValidation(stockRequest) {
 };
 
 function PublishNewOffer(auctionData) {
-  const data = auctionData;
-  data.type = 'offer';
+  console.log('----- Oferta para enviar -----')
+  console.log(auctionData);
+  const data = {
+    auction_id: auctionData.auction_id,
+    group_id: auctionData.group_id,
+    proposal_id: '',
+    quantity: auctionData.quantity,
+    stock_id: auctionData.stock_id,
+    type: 'offer'
+  };
   mqttClientSender.publish('stocks/auctions', JSON.stringify(data), (error) => {
     if (error) {
       console.log(error);
     } else {
-      console.log(`'${data.type}' enviada con éxito:\n${auctionData}`);
+      console.log(`'${data.type}' enviada con éxito`);
     }
   });
 };
 
 function PublishNewProposal(auctionData) {
-  const data = auctionData;
-  data.type = 'proposal';
+  console.log('----- Propuesta para enviar -----')
+  console.log(auctionData);
+  const data = {
+    auction_id: auctionData.auction_id,
+    group_id: auctionData.group_id,
+    proposal_id: auctionData.proposal_id,
+    quantity: auctionData.quantity,
+    stock_id: auctionData.stock_id,
+    type: 'proposal'
+  };
   mqttClientSender.publish('stocks/auctions', JSON.stringify(data), (error) => {
     if (error) {
       console.log(error);
     } else {
-      console.log(`'${data.type}' enviada con éxito:\n${auctionData}`);
+      console.log(`'${data.type}' enviada con éxito`);
     }
   });
 };
 
 function PublishAcceptance(auctionData) {
-  const data = auctionData;
-  data.type = 'acceptance';
+  console.log('----- Propuesta aceptada -----')
+  console.log(auctionData);
+  const data = {
+    auction_id: auctionData.auction_id,
+    group_id: auctionData.group_id,
+    proposal_id: auctionData.proposal_id,
+    quantity: auctionData.quantity,
+    stock_id: auctionData.stock_id,
+    type: 'acceptance'
+  };
   mqttClientSender.publish('stocks/auctions', JSON.stringify(data), (error) => {
     if (error) {
       console.log(error);
     } else {
-      console.log(`'${data.type}' enviada con éxito:\n${auctionData}`);
+      console.log(`'${data.type}' enviada con éxito`);
     }
   });
 };
 
 function PublishRejection(auctionData) {
-  const data = auctionData;
-  data.type = 'rejection';
+  console.log('----- Propuesta rechazada -----')
+  console.log(auctionData);
+  const data = {
+    auction_id: auctionData.auction_id,
+    group_id: auctionData.group_id,
+    proposal_id: auctionData.proposal_id,
+    quantity: auctionData.quantity,
+    stock_id: auctionData.stock_id,
+    type: 'rejection'
+  };
   mqttClientSender.publish('stocks/auctions', JSON.stringify(data), (error) => {
     if (error) {
       console.log(error);
     } else {
-      console.log(`'${data.type}' enviada con éxito:\n${auctionData}`);
+      console.log(`'${data.type}' enviada con éxito`);
     }
   });
 };

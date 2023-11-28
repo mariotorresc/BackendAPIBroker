@@ -33,31 +33,31 @@ router.post("/validation", async (ctx) => {
 });
 
 router.post("/offer", async (ctx) => {
-  const { auctionData } = ctx.request.body;
+  const auctionData = ctx.request.body;
   await PublishNewOffer(auctionData);
   ctx.status = 200;
-  ctx.body = "Validation sent";
+  ctx.body = "offer sent";
 });
 
 router.post("/proposal", async (ctx) => {
-  const { auctionData } = ctx.request.body;
+  const auctionData = ctx.request.body;
   await PublishNewProposal(auctionData);
   ctx.status = 200;
-  ctx.body = "Validation sent";
+  ctx.body = "proposal sent";
 });
 
 router.post("/acceptance", async (ctx) => {
-  const { auctionData } = ctx.request.body;
+  const auctionData = ctx.request.body;
   await PublishAcceptance(auctionData);
   ctx.status = 200;
-  ctx.body = "Validation sent";
+  ctx.body = "acceptance sent";
 });
 
 router.post("/rejection", async (ctx) => {
-  const { auctionData } = ctx.request.body;
+  const auctionData = ctx.request.body;
   await PublishRejection(auctionData);
   ctx.status = 200;
-  ctx.body = "Validation sent";
+  ctx.body = "rejection sent";
 });
 
 module.exports = router;
