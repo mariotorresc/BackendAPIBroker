@@ -93,10 +93,14 @@ router.get('get-proposals', '/proposals', async (ctx) => {
     const offer_ids = offers.map((offer) => offer.auction_id);
 
     // Obtener offers que sean nuestras, por cada una revisar si tienen alguna proposal
+    const allProposals = await ctx.orm.Proposal.findAll();
     const { count, rows } = await ctx.orm.Proposal.findAndCountAll({
       where: {
         auction_id: {
           [Op.or]: offer_ids,
+        },
+        group_id: {
+          [Op.ne]: GROUP_NUMBER,
         },
         status: 'pending'
       },
@@ -104,6 +108,7 @@ router.get('get-proposals', '/proposals', async (ctx) => {
     ctx.body = {
       proposals: rows,
       totalItems: count,
+      allProposals
     };
     ctx.status = 200;
   } catch (err) {
@@ -116,6 +121,9 @@ router.post('new-proposal', '/proposals/new', async (ctx) => {
   try {
     // Propuestas hechas por admin nuestro
     const { auction_id, stock_id, quantity } = ctx.request.body;
+    console.log(auction_id)
+    console.log(stock_id)
+    console.log(quantity)
 
     const newAuction = await ctx.orm.Proposal.create({
       auction_id,
@@ -148,7 +156,7 @@ router.post('response-to-proposal', '/proposals/response', async (ctx) => {
 
     // FindOne Proposal con proposal_id y Auction con auction_id
     const admin = await ctx.orm.user.findOne({
-      where: { email },
+      where: { admin: true },
     });
     const proposal = await ctx.orm.Proposal.findOne({
       where: { proposal_id },
@@ -192,8 +200,11 @@ router.post('response-to-proposal', '/proposals/response', async (ctx) => {
         proposal_id: proposal.proposal_id,
       });
       // Restar
+      const mySoldStock = await ctx.orm.stock.findOne({
+        where: { symbol: offer.stock_id}
+      });
       const soldStock = await ctx.orm.userStock.findOne({
-        where: { stockId: offer.stock_id, userId: admin.id },
+        where: { stockId: mySoldStock.id, userId: admin.id },
       });
 
       await soldStock.update({
@@ -205,9 +216,12 @@ router.post('response-to-proposal', '/proposals/response', async (ctx) => {
         attributes: ['symbol', 'id'],
         where: { symbol: proposal.stock_id },
       });
+      const myBoughtStock = await ctx.orm.stock.findOne({
+        where: { symbol: proposal.stock_id}
+      });
 
       const boughtStock = await ctx.orm.userStock.findOne({
-        where: { stockId: proposal.stock_id, userId: admin.id },
+        where: { stockId: myBoughtStock.id, userId: admin.id },
       });
       if (!boughtStock) {
         await ctx.orm.userStock.create({
