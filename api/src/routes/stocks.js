@@ -33,7 +33,7 @@ router.get('get-all-stocks', '/', async (ctx) => {
 
 // get stocks admin
 
-router.get('get-all-stocks-admin', '/stocksadmin', async (ctx) => {
+router.get('get-all-stocks-admin', '/stocks-admin', async (ctx) => {
   const page = parseInt(ctx.query.page) || 1;
   const itemsPerPage = parseInt(ctx.query.size) || 25;
   try {
@@ -104,14 +104,15 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
   }
 });
 
-router.post('/buy-stock/admin', async (ctx) => {
+router.post('/buy-stock-admin', '/admin', async (ctx) => {
   try {
     // Parse data from the request
-    const { userId, stockId, amount } = ctx.request.body;
+    const { email, stockId, amount } = ctx.request.body;
 
     // Find the user and stock
-    const user = await models.user.findByPk(userId);
+    const user = await models.user.findByOne( { where: { email} });
     const stock = await models.stock.findByPk(stockId);
+    const userId = user.id;
 
     // Check if the user and stock exist
     if (!user || !stock) {
@@ -129,6 +130,7 @@ router.post('/buy-stock/admin', async (ctx) => {
     });
 
     const adminStock = adminUser.stocks.find((adminStock) => adminStock.id === stock.id);
+    const companyId = stock.companyId;
 
     if (!adminStock || adminStock.amount < amount) {
       ctx.status = 400;
@@ -141,6 +143,7 @@ router.post('/buy-stock/admin', async (ctx) => {
       userId,
       stockId,
       amount,
+      companyId,
     });
 
     // Update the admin's stock amount
