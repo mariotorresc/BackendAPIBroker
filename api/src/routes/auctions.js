@@ -160,7 +160,7 @@ router.post('response-to-proposal', '/proposals/response', async (ctx) => {
       ctx.status = 404;
       ctx.body = { message: 'User not found' };
       return;
-    } else if (admin.email !== 'sasanmartin6@uc.cl') {
+    } else if (admin.admin !== true) {
       // TO DO: Al mergear las branch cambiar condition por admin.admin !== true
       ctx.status = 400;
       ctx.body = { message: 'User is not admin' };
