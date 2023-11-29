@@ -5,7 +5,7 @@ module.exports = {
     queryInterface.createTable('userStocks', {
       amount: {
         allowNull: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.FLOAT,
       },
       companyId: {
         allowNull: false,

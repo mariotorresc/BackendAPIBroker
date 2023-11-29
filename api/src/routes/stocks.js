@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const tx = require('../utils/trx');
 const { PublishNewRequest, PublishValidation } = require('../requests/mqttRequests');
 const { SaveRequests } = require('../helpers/requests');
+const { UpdateWallet } = require('../helpers/purchases');
 require('dotenv').config();
 
 const router = new KoaRouter();
@@ -14,6 +15,39 @@ router.get('get-all-stocks', '/', async (ctx) => {
   const itemsPerPage = parseInt(ctx.query.size) || 25;
   try {
     const { count, rows } = await ctx.orm.stock.findAndCountAll({
+      limit: itemsPerPage,
+      offset: (page - 1) * itemsPerPage,
+      order: [['lastUpdate', 'DESC']],
+    });
+    ctx.body = {
+      currentPage: page,
+      stocks: rows,
+      totalItems: count,
+      totalPages: Math.ceil(count / itemsPerPage),
+    };
+    ctx.status = 200;
+  } catch (err) {
+    ctx.body = err.message;
+    ctx.status = 400;
+  }
+});
+
+// get stocks admin
+
+router.get('get-all-stocks-admin', '/stocks-admin', async (ctx) => {
+  const page = parseInt(ctx.query.page) || 1;
+  const itemsPerPage = parseInt(ctx.query.size) || 25;
+  try {
+    const adminUserStocks = await models.user.findOne({
+      where: {
+        admin: true,
+      },
+      include: [models.stock], // Include the associated stocks
+    });
+    const adminStocks = adminUserStocks.stocks;
+    const { count, rows } = await ctx.orm.stock.findAndCountAll({
+      where: { id: adminStocks.map((stock) => stock.id),
+      },
       limit: itemsPerPage,
       offset: (page - 1) * itemsPerPage,
       order: [['lastUpdate', 'DESC']],
@@ -70,6 +104,62 @@ router.get('get-stock-by-stockId', '/:symbol', async (ctx) => {
     ctx.status = 400;
   }
 });
+
+router.post('/buy-stock-admin', '/admin', async (ctx) => {
+  try {
+    // Parse data from the request
+    const { email, stockId, amount } = ctx.request.body;
+
+    // Find the user and stock
+    const user = await models.user.findByOne( { where: { email} });
+    const stock = await models.stock.findByPk(stockId);
+    const userId = user.id;
+
+    // Check if the user and stock exist
+    if (!user || !stock) {
+      ctx.status = 404;
+      ctx.body = { message: 'User or stock not found' };
+      return;
+    }
+
+    // Check if the admin user has sufficient stocks
+    const adminUser = await models.user.findOne({
+      where: {
+        admin: true,
+      },
+      include: [models.stock], // Include the associated stocks
+    });
+
+    const adminStock = adminUser.stocks.find((adminStock) => adminStock.id === stock.id);
+    const companyId = stock.companyId;
+
+    if (!adminStock || adminStock.amount < amount) {
+      ctx.status = 400;
+      ctx.body = { message: 'Insufficient stocks available for purchase' };
+      return;
+    }
+
+    // Create a new userStock entry for the user
+    const userStock = await models.userStock.create({
+      userId,
+      stockId,
+      amount,
+      companyId,
+    });
+
+    // Update the admin's stock amount
+    adminStock.amount -= amount;
+    await adminStock.save();
+
+    ctx.status = 200;
+    ctx.body = { message: 'Stock purchased successfully', userStock };
+  } catch (error) {
+    console.error(error);
+    ctx.status = 500;
+    ctx.body = { message: 'Internal Server Error' };
+  }
+});
+
 
 // receive a purchase from the endpoint /stocks/purchase
 router.post('/post-stock-purchase', '/purchase', async (ctx) => {
@@ -161,12 +251,12 @@ router.post('/transaction-details', '/transaction-details', async (ctx) => {
     const request = await ctx.orm.request.findOne({
       where: { depositToken: token_ws },
     });
-    request.update({
+    await request.update({
       state: false,
       validated: true,
     });
     // Enviar el fallo por el canal de validaciones
-    PublishValidation({
+    await PublishValidation({
       group_id: request.groupId,
       request_id: request.uuid,
       seller: request.seller,
@@ -182,10 +272,11 @@ router.post('/transaction-details', '/transaction-details', async (ctx) => {
   const request = await ctx.orm.request.findOne({
     where: { depositToken: token_ws },
   });
-  request.update({
+  await request.update({
     state: true,
     validated: true,
   });
+  await UpdateWallet(token_ws);
   // Enviar el exito por el canal de validaciones
   PublishValidation({
     group_id: request.groupId,
@@ -193,6 +284,7 @@ router.post('/transaction-details', '/transaction-details', async (ctx) => {
     seller: request.seller,
     valid: true,
   });
+
   ctx.status = 200;
   ctx.body = {
     message: 'Transaccion ha sido aceptada',

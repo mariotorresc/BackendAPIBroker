@@ -3,6 +3,10 @@ const KoaRouter = require("koa-router");
 const {
   PublishNewRequest,
   PublishValidation,
+  PublishNewOffer,
+  PublishRejection,
+  PublishNewProposal,
+  PublishAcceptance,
 } = require("..//mqtts/mqttSender");
 
 const router = new KoaRouter();
@@ -26,6 +30,34 @@ router.post("/validation", async (ctx) => {
   await PublishValidation(stockRequest);
   ctx.status = 200;
   ctx.body = "Validation sent";
+});
+
+router.post("/offer", async (ctx) => {
+  const auctionData = ctx.request.body;
+  await PublishNewOffer(auctionData);
+  ctx.status = 200;
+  ctx.body = "offer sent";
+});
+
+router.post("/proposal", async (ctx) => {
+  const auctionData = ctx.request.body;
+  await PublishNewProposal(auctionData);
+  ctx.status = 200;
+  ctx.body = "proposal sent";
+});
+
+router.post("/acceptance", async (ctx) => {
+  const auctionData = ctx.request.body;
+  await PublishAcceptance(auctionData);
+  ctx.status = 200;
+  ctx.body = "acceptance sent";
+});
+
+router.post("/rejection", async (ctx) => {
+  const auctionData = ctx.request.body;
+  await PublishRejection(auctionData);
+  ctx.status = 200;
+  ctx.body = "rejection sent";
 });
 
 module.exports = router;
