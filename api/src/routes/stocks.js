@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const tx = require('../utils/trx');
 const { PublishNewRequest, PublishValidation } = require('../requests/mqttRequests');
 const { SaveRequests } = require('../helpers/requests');
+const { UpdateWallet } = require('../helpers/purchases');
 require('dotenv').config();
 
 const router = new KoaRouter();
@@ -161,12 +162,12 @@ router.post('/transaction-details', '/transaction-details', async (ctx) => {
     const request = await ctx.orm.request.findOne({
       where: { depositToken: token_ws },
     });
-    request.update({
+    await request.update({
       state: false,
       validated: true,
     });
     // Enviar el fallo por el canal de validaciones
-    PublishValidation({
+    await PublishValidation({
       group_id: request.groupId,
       request_id: request.uuid,
       seller: request.seller,
@@ -182,10 +183,11 @@ router.post('/transaction-details', '/transaction-details', async (ctx) => {
   const request = await ctx.orm.request.findOne({
     where: { depositToken: token_ws },
   });
-  request.update({
+  await request.update({
     state: true,
     validated: true,
   });
+  await UpdateWallet(token_ws);
   // Enviar el exito por el canal de validaciones
   PublishValidation({
     group_id: request.groupId,
@@ -193,6 +195,7 @@ router.post('/transaction-details', '/transaction-details', async (ctx) => {
     seller: request.seller,
     valid: true,
   });
+
   ctx.status = 200;
   ctx.body = {
     message: 'Transaccion ha sido aceptada',
