@@ -31,7 +31,7 @@ async function SaveRequests(stockRequest) {
   } catch (error) {
     console.log(error);
   }
-};
+}
 
 async function SaveExternalRequests(requestInfo) {
   try {

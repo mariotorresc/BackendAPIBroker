@@ -3,6 +3,11 @@ module.exports = {
 
   up: (queryInterface, Sequelize) =>
     queryInterface.createTable('users', {
+      admin: {
+        allowNull: false,
+        defaultValue: false,
+        type: Sequelize.BOOLEAN,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -10,11 +15,6 @@ module.exports = {
       deletedAt: {
         allowNull: true,
         type: Sequelize.DATE,
-      },
-      admin: {
-        allowNull: false,
-        defaultValue: false,
-        type: Sequelize.BOOLEAN,
       },
       email: {
         allowNull: false,

@@ -2,8 +2,7 @@
 /* eslint-disable radix */
 const KoaRouter = require('koa-router');
 const { v4: uuidv4 } = require('uuid');
-const { Op } = require("sequelize");
-const tx = require('../utils/trx');
+const { Op } = require('sequelize');
 const {
   PublishOffer,
   PublishProposal,
@@ -44,8 +43,8 @@ router.post('new-offer', '/offers/new', async (ctx) => {
       auction_id: uuidv4(),
       group_id: GROUP_NUMBER,
       proposal_id: '',
-      quantity: quantity,
-      stock_id: stock_id,
+      quantity,
+      stock_id,
     });
 
     await PublishOffer(newAuction);
@@ -92,7 +91,7 @@ router.get('get-proposals', '/proposals', async (ctx) => {
     });
 
     const offer_ids = offers.map((offer) => offer.auction_id);
-    
+
     // Obtener offers que sean nuestras, por cada una revisar si tienen alguna proposal
     const { count, rows } = await ctx.orm.Proposal.findAndCountAll({
       where: {
@@ -119,12 +118,12 @@ router.post('new-proposal', '/proposals/new', async (ctx) => {
     const { auction_id, stock_id, quantity } = ctx.request.body;
 
     const newAuction = await ctx.orm.Proposal.create({
-      auction_id: auction_id,
+      auction_id,
       group_id: GROUP_NUMBER,
       proposal_id: uuidv4(),
-      quantity: quantity,
+      quantity,
       status: 'pending',
-      stock_id: stock_id,
+      stock_id,
     });
 
     PublishProposal(newAuction);
@@ -143,25 +142,26 @@ router.post('response-to-proposal', '/proposals/response', async (ctx) => {
   try {
     // Este endpoint maneja las respuestas de nuestro admin
     // response es 'acceptance' o 'rejection'
-    const { auction_id, email, proposal_id, response } = ctx.request.body;
+    const {
+      auction_id, email, proposal_id, response
+    } = ctx.request.body;
 
     // FindOne Proposal con proposal_id y Auction con auction_id
     const admin = await ctx.orm.user.findOne({
-      where: { email: email },
+      where: { email },
     });
     const proposal = await ctx.orm.Proposal.findOne({
-      where: { proposal_id: proposal_id },
+      where: { proposal_id },
     });
     const offer = await ctx.orm.Auction.findOne({
-      where: { auction_id: auction_id },
+      where: { auction_id },
     });
-  
+
     if (!admin) {
       ctx.status = 404;
       ctx.body = { message: 'User not found' };
       return;
-    } else if (admin.admin !== true) {
-      // TO DO: Al mergear las branch cambiar condition por admin.admin !== true
+    } if (admin.admin !== true) {
       ctx.status = 400;
       ctx.body = { message: 'User is not admin' };
       return;
@@ -170,16 +170,15 @@ router.post('response-to-proposal', '/proposals/response', async (ctx) => {
       ctx.status = 404;
       ctx.body = { message: 'Proposal not found' };
       return;
-    } else if (!offer) {
+    } if (!offer) {
       ctx.status = 404;
       ctx.body = { message: 'Offer not found' };
       return;
-    } else if (offer.proposal_id !== '') {
+    } if (offer.proposal_id !== '') {
       ctx.status = 400;
       ctx.body = { message: 'Offer is closed' };
       return;
     }
-
 
     if (response === 'acceptance') {
       // TO DO
@@ -198,7 +197,7 @@ router.post('response-to-proposal', '/proposals/response', async (ctx) => {
       });
 
       await soldStock.update({
-        amount: boughtStock - offer.quantity,
+        amount: soldStock.amount - offer.quantity,
       });
 
       // Agregar
@@ -213,16 +212,15 @@ router.post('response-to-proposal', '/proposals/response', async (ctx) => {
       if (!boughtStock) {
         await ctx.orm.userStock.create({
           amount: proposal.quantity,
+          companyId: fromCompany.id,
           stockId: proposal.stock_id,
-          userId: admin.id,
-          companyId: fromCompany.id
+          userId: admin.id
         });
       } else {
         await boughtStock.update({
           amount: boughtStock + proposal.quantity
         });
       }
-      
     } else if (response === 'rejection') {
       // Marcar el status de la propuesta a rejection
       HandleRejection(proposal);
@@ -234,18 +232,9 @@ router.post('response-to-proposal', '/proposals/response', async (ctx) => {
       ctx.body = { message: 'input error' };
       return;
     }
-    const newAuction = await ctx.orm.Proposal.create({
-      auction_id: auction_id,
-      group_id: GROUP_NUMBER,
-      proposal_id: uuidv4(),
-      quantity: quantity,
-      status: 'pending',
-      stock_id: stock_id,
-    });
-
 
     ctx.body = {
-      offer: newAuction,
+      message: 'Realizado con exito',
     };
     ctx.status = 201;
   } catch (err) {
@@ -266,11 +255,11 @@ router.post('new-proposal-mqtt', '/proposals/new/mqtt', async (ctx) => {
       ctx.status = 200;
       ctx.body = { message: 'Offer not found' };
       return;
-    } else if (offer.group_id !== GROUP_NUMBER) {
+    } if (offer.group_id !== GROUP_NUMBER) {
       ctx.status = 200;
       ctx.body = { message: 'Offer not owned by this group' };
       return;
-    } else if (offer.proposal_id !== '') {
+    } if (offer.proposal_id !== '') {
       ctx.status = 200;
       ctx.body = { message: 'Offer is closed' };
       return;

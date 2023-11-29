@@ -1,40 +1,39 @@
-'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable('Auctions');
+  },
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Auctions', {
+      auction_id: {
+        type: Sequelize.STRING
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      group_id: {
+        type: Sequelize.INTEGER
+      },
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      auction_id: {
-        type: Sequelize.STRING
-      },
       proposal_id: {
-        type: Sequelize.STRING
-      },
-      stock_id: {
         type: Sequelize.STRING
       },
       quantity: {
         type: Sequelize.INTEGER
       },
-      group_id: {
-        type: Sequelize.INTEGER
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+      stock_id: {
+        type: Sequelize.STRING
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
       }
     });
-  },
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Auctions');
   }
 };

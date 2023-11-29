@@ -39,18 +39,17 @@ router.get('get-all-stocks-admin', '/stocks-admin', async (ctx) => {
   const itemsPerPage = parseInt(ctx.query.size) || 25;
   try {
     const adminUserStocks = await models.user.findOne({
+      include: [models.stock],
       where: {
         admin: true,
-      },
-      include: [models.stock], // Include the associated stocks
+      }, // Include the associated stocks
     });
     const adminStocks = adminUserStocks.stocks;
     const { count, rows } = await ctx.orm.stock.findAndCountAll({
-      where: { id: adminStocks.map((stock) => stock.id),
-      },
       limit: itemsPerPage,
       offset: (page - 1) * itemsPerPage,
       order: [['lastUpdate', 'DESC']],
+      where: { id: adminStocks.map((stock) => stock.id), },
     });
     ctx.body = {
       currentPage: page,
@@ -111,7 +110,7 @@ router.post('/buy-stock-admin', '/admin', async (ctx) => {
     const { email, stockId, amount } = ctx.request.body;
 
     // Find the user and stock
-    const user = await models.user.findByOne( { where: { email} });
+    const user = await models.user.findByOne({ where: { email } });
     const stock = await models.stock.findByPk(stockId);
     const userId = user.id;
 
@@ -124,14 +123,14 @@ router.post('/buy-stock-admin', '/admin', async (ctx) => {
 
     // Check if the admin user has sufficient stocks
     const adminUser = await models.user.findOne({
+      include: [models.stock],
       where: {
         admin: true,
-      },
-      include: [models.stock], // Include the associated stocks
+      }, // Include the associated stocks
     });
 
     const adminStock = adminUser.stocks.find((adminStock) => adminStock.id === stock.id);
-    const companyId = stock.companyId;
+    const { companyId } = stock;
 
     if (!adminStock || adminStock.amount < amount) {
       ctx.status = 400;
@@ -141,10 +140,10 @@ router.post('/buy-stock-admin', '/admin', async (ctx) => {
 
     // Create a new userStock entry for the user
     const userStock = await models.userStock.create({
-      userId,
-      stockId,
       amount,
       companyId,
+      stockId,
+      userId,
     });
 
     // Update the admin's stock amount
@@ -160,10 +159,11 @@ router.post('/buy-stock-admin', '/admin', async (ctx) => {
   }
 });
 
-
 // receive a purchase from the endpoint /stocks/purchase
 router.post('/post-stock-purchase', '/purchase', async (ctx) => {
-  const { symbol, quantity, groupId, email, priceToPay } = ctx.request.body;
+  const {
+    symbol, quantity, groupId, email, priceToPay
+  } = ctx.request.body;
   try {
     const stock = await ctx.orm.stock.findOne({
       where: { symbol },

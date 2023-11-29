@@ -5,12 +5,12 @@ module.exports = {
     const usersArray = [];
     // Users Admin
     usersArray.push({
+      admin: true,
       createdAt: new Date(),
       email: 'sasanmartinadmin@uc.cl',
       lastName: 'San Martín',
       name: 'Sebastían',
       password: 'hola1234',
-      admin: true,
       updatedAt: new Date(),
     });
     return queryInterface.bulkInsert('users', usersArray);
