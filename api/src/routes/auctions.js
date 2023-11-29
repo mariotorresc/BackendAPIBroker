@@ -98,7 +98,8 @@ router.get('get-proposals', '/proposals', async (ctx) => {
       where: {
         auction_id: {
           [Op.or]: offer_ids,
-        }
+        },
+        status: 'pending'
       },
     });
     ctx.body = {
@@ -142,19 +143,96 @@ router.post('response-to-proposal', '/proposals/response', async (ctx) => {
   try {
     // Este endpoint maneja las respuestas de nuestro admin
     // response es 'acceptance' o 'rejection'
-    const { auction_id, proposal_id, response } = ctx.request.body;
+    const { auction_id, email, proposal_id, response } = ctx.request.body;
 
     // FindOne Proposal con proposal_id y Auction con auction_id
+    const admin = await ctx.orm.user.findOne({
+      where: { email: email },
+    });
+    const proposal = await ctx.orm.Proposal.findOne({
+      where: { proposal_id: proposal_id },
+    });
+    const offer = await ctx.orm.Auction.findOne({
+      where: { auction_id: auction_id },
+    });
+  
+    if (!admin) {
+      ctx.status = 404;
+      ctx.body = { message: 'User not found' };
+      return;
+    } else if (admin.email !== 'sasanmartin6@uc.cl') {
+      // TO DO: Al mergear las branch cambiar condition por admin.admin !== true
+      ctx.status = 400;
+      ctx.body = { message: 'User is not admin' };
+      return;
+    }
+    if (!proposal) {
+      ctx.status = 404;
+      ctx.body = { message: 'Proposal not found' };
+      return;
+    } else if (!offer) {
+      ctx.status = 404;
+      ctx.body = { message: 'Offer not found' };
+      return;
+    } else if (offer.proposal_id !== '') {
+      ctx.status = 400;
+      ctx.body = { message: 'Offer is closed' };
+      return;
+    }
+
 
     if (response === 'acceptance') {
+      // TO DO
       // Restar Stocks de la oferta
       // Sumar  Stocks de la propuesta
-      // Colocar en proposal_id de Auction el proposal_id de Proposal -> Offer completada
-      // Marcar el status de la propuesta a acceptance
-      HandleAcceptance(algo);
+      HandleAcceptance(proposal);
+      await proposal.update({
+        status: 'acceptance',
+      });
+      await offer.update({
+        proposal_id: proposal.proposal_id,
+      });
+      // Restar
+      const soldStock = await ctx.orm.userStock.findOne({
+        where: { stockId: offer.stock_id, userId: admin.id },
+      });
+
+      await soldStock.update({
+        amount: boughtStock - offer.quantity,
+      });
+
+      // Agregar
+      const fromCompany = await ctx.orm.company.findOne({
+        attributes: ['symbol', 'id'],
+        where: { symbol: proposal.stock_id },
+      });
+
+      const boughtStock = await ctx.orm.userStock.findOne({
+        where: { stockId: proposal.stock_id, userId: admin.id },
+      });
+      if (!boughtStock) {
+        await ctx.orm.userStock.create({
+          amount: proposal.quantity,
+          stockId: proposal.stock_id,
+          userId: admin.id,
+          companyId: fromCompany.id
+        });
+      } else {
+        await boughtStock.update({
+          amount: boughtStock + proposal.quantity
+        });
+      }
+      
     } else if (response === 'rejection') {
       // Marcar el status de la propuesta a rejection
-      HandleRejection(algo);
+      HandleRejection(proposal);
+      await proposal.update({
+        status: 'rejection',
+      });
+    } else {
+      ctx.status = 400;
+      ctx.body = { message: 'input error' };
+      return;
     }
     const newAuction = await ctx.orm.Proposal.create({
       auction_id: auction_id,
@@ -179,15 +257,26 @@ router.post('response-to-proposal', '/proposals/response', async (ctx) => {
 router.post('new-proposal-mqtt', '/proposals/new/mqtt', async (ctx) => {
   try {
     // Propuestas hechas por otros grupos
-    // Si la offer que recibe esta nueva propuesta es nuestra offer -> Guardarla
-    // Si la offer que recibe esta nueva propuesta NO es nuestra offer -> no Guardarla
     const auctionData = ctx.request.body;
 
-    // FindOne Auction por auctionData.auction_id
-    // If group_id === Otro grupo no que somos nosotros, do nothing
-    // Else, guardar en DB
+    const offer = await ctx.orm.Auction.findOne({
+      where: { auction_id: auctionData.auction_id },
+    });
+    if (!offer) {
+      ctx.status = 200;
+      ctx.body = { message: 'Offer not found' };
+      return;
+    } else if (offer.group_id !== GROUP_NUMBER) {
+      ctx.status = 200;
+      ctx.body = { message: 'Offer not owned by this group' };
+      return;
+    } else if (offer.proposal_id !== '') {
+      ctx.status = 200;
+      ctx.body = { message: 'Offer is closed' };
+      return;
+    }
 
-    const newAuction = await ctx.orm.Proposal.create({
+    const newProposal = await ctx.orm.Proposal.create({
       auction_id: auctionData.auction_id,
       group_id: auctionData.group_id,
       proposal_id: auctionData.proposal_id,
@@ -197,7 +286,7 @@ router.post('new-proposal-mqtt', '/proposals/new/mqtt', async (ctx) => {
     });
 
     ctx.body = {
-      offer: newAuction,
+      offer: newProposal,
     };
     ctx.status = 201;
   } catch (err) {

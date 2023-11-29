@@ -62,6 +62,8 @@ mqttClient.on("message", (topic, message) => {
       // Subasta
       if (auctionData?.group_id !== GROUP_NUMBER) {
         SaveAuction(auctionData);
+      } else {
+        console.log('Se ignora porque es nuestro.')
       }
     }
     else if (auctionData.type === 'proposal') {
@@ -74,7 +76,7 @@ mqttClient.on("message", (topic, message) => {
       // Respuesta a Propuesta
       // Una propuesta fue aceptada
       // Buscar propuesta, marcarla como aceptada
-      // Si aceptan una propuesta de nuestro grupo. Eliminar propuesta, sumar acciones a las acciones disponibles para comprar en nuestra app
+      // Si aceptan una propuesta de nuestro grupo. , sumar acciones a las acciones disponibles para comprar en nuestra app
       // Si es de otro grupo, buscar si nuestro grupo hizo una propuesta. Si esa propuesta existe, marcarla como rechazada
       HandleAcceptance(auctionData);
     }
